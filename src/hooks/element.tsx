@@ -46,22 +46,18 @@ export function usePortal ({ targetSelector, id, position = 'after' }: UsePortal
       return
     }
 
-    switch (position) {
-      case 'before':
-        tgNode.insertAdjacentElement('beforebegin', div)
-        break
-      case 'prepend':
-        tgNode.insertAdjacentElement('afterbegin', div)
-        break
-      case 'append':
-        tgNode.insertAdjacentElement('beforeend', div)
-        break
-      case 'after':
-        tgNode.insertAdjacentElement('afterend', div)
-        break
-      default:
-        tgNode.appendChild(div)
-        break
+    const positionMap: Record<InsertPositions, InsertPosition> = {
+      before: 'beforebegin',
+      prepend: 'afterbegin',
+      append: 'beforeend',
+      after: 'afterend'
+    }
+
+    const insertPosition = positionMap[position]
+    if (insertPosition) {
+      tgNode.insertAdjacentElement(insertPosition, div)
+    } else {
+      tgNode.appendChild(div)
     }
 
     return () => {
