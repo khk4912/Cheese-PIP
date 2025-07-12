@@ -38,21 +38,26 @@
   border-radius: 2em;
   aspect-ratio: 1.7/1;
   height: 4vh;
+
+  position: relative;
+  transition: background-color 0.2s;
 }
 
 [type="checkbox"]:before {
   content: "";
-  display: block;
-  height: 85%;
-  aspect-ratio: 1/1;
-  margin-left: 4%;
-  background-color: white;
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  width: 50%;
+  aspect-ratio: 1 / 1;
+  transform: translateY(-50%);
+  background: #fff;
   border-radius: 50%;
-  transition: transform 0.2s;
+  transition: left 0.2s;
 }
 
 [type="checkbox"]:checked::before {
-  transform: translateX(90%);
+  left: 4%;
 }
 
 [type="checkbox"]:checked {
