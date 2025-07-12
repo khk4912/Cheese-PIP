@@ -47,7 +47,7 @@
   content: "";
   position: absolute;
   top: 50%;
-  left: 45%;
+  left: 4%;
   width: 50%;
   aspect-ratio: 1 / 1;
   transform: translateY(-50%);
@@ -57,7 +57,7 @@
 }
 
 [type="checkbox"]:checked::before {
-  left: 4%;
+  left: 45%;
 }
 
 [type="checkbox"]:checked {
