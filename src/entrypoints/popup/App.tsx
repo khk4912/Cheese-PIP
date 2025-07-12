@@ -46,9 +46,8 @@ export default function App (): React.ReactNode {
           </Option>
           <Option>
             <Option.Header
-              title='자동 해상도 변경 (베타)'
-              desc='방송 해상도를 최고 품질로 자동선택합니다.
-                  (활성화 시 수동 해상도 선택이 불가능한 오류가 발생할 수 있습니다.)'
+              title='자동 해상도 변경'
+              desc='방송 해상도를 최고 품질로 자동으로 변경합니다.'
             />
             <Option.CheckButton optionID='preferHQ' />
           </Option>
