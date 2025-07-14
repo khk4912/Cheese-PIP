@@ -135,7 +135,14 @@ async function _stopRecord (
   // '영상 빠른 저장' 미사용시 결과 페이지 표시
   window.open(chrome.runtime.getURL('/record_result.html'))
   setTimeout(() => {
-    if (isMoz) { // Firefox 브라우저에서 녹화 Blob을 메시지로
+    if (isMoz) {
+      // RecordInfo도 전송
+      chrome.runtime.sendMessage({
+        type: 'mozRecordInfo',
+        recordInfo: info
+      }).catch(console.error)
+
+      // Blob을 Firefox에서 Message로 전송
       fetch(info.resultBlobURL)
         .then(res => res.blob())
         .then(blob => {
@@ -146,6 +153,8 @@ async function _stopRecord (
             .catch(console.error)
         })
         .catch(console.error)
+
+      URL.revokeObjectURL(info.resultBlobURL)
     }
   }, 500)
 }

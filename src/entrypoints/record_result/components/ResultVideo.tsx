@@ -3,6 +3,16 @@ import type { DownloadInfo, RecordInfo } from '../../../types/record_info'
 
 const isMoz = navigator.userAgent.includes('Firefox')
 
+interface MozRecordInfo {
+  type: 'mozRecordInfo'
+  recordInfo: RecordInfo
+}
+
+interface MozRecordBlob {
+  type: 'mozRecordBlob'
+  resultBlob: Blob
+}
+
 export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispatch<React.SetStateAction<DownloadInfo | undefined>> }): React.ReactNode {
   const [recordInfo, setRecordInfo] = useState<RecordInfo>()
 
@@ -36,27 +46,30 @@ export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispa
 
   useEffect(() => {
     if (isMoz) {
-      chrome.runtime.onMessage.addListener((message: { type: string; resultBlob: Blob }) => {
+      getRecordInfo()
+        .then((info) => { setRecordInfo(info) })
+        .catch(console.error)
+
+      chrome.runtime.onMessage.addListener((message: MozRecordBlob | MozRecordInfo) => {
         if (message.type === 'mozRecordBlob') {
-          getRecordInfo()
-            .then((info) => {
-              if (info.resultBlobURL === '') {
-                return
-              }
+          const blob = new Blob([message.resultBlob], { type: message.resultBlob.type })
+          const url = URL.createObjectURL(blob)
 
-              const blob = new Blob([message.resultBlob], { type: message.resultBlob.type })
-              const url = URL.createObjectURL(blob)
+          setRecordInfo((prev) => {
+            if (!prev) return prev
+            return { ...prev, resultBlobURL: url }
+          })
+        } else if (message.type === 'mozRecordInfo') {
+          const info = message.recordInfo
+          setRecordInfo(info)
 
-              info.resultBlobURL = url
-              setRecordInfo(info)
-            })
-            .catch(console.error)
+          // 비디오 요소에 녹화된 Blob URL 설정
+          const video = document.querySelector('video')
+          if (video instanceof HTMLVideoElement) {
+            video.src = info.resultBlobURL
+          }
         }
       })
-    } else {
-      getRecordInfo()
-        .then(setRecordInfo)
-        .catch(console.error)
     }
   }, [])
 
