@@ -70,6 +70,10 @@ export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispa
           }
         }
       })
+    } else {
+      getRecordInfo()
+        .then(setRecordInfo)
+        .catch(console.error)
     }
   }, [])
 
