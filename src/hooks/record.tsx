@@ -1,7 +1,28 @@
+function handleFirefoxAudio (video: HTMLVideoElement): () => void {
+  if (!isMoz) {
+    return () => {}
+  }
+
+  const ctx = new AudioContext()
+  const stream = new MediaStream()
+
+  video.mozCaptureStream()
+    .getAudioTracks()
+    .forEach((track) => {
+      stream.addTrack(track)
+    })
+  const src = ctx.createMediaStreamSource(stream)
+
+  src.connect(ctx.destination)
+  return () => { ctx.close().catch(console.error) }
+}
+
 export function useRecord () {
   const [isRecording, setIsRecording] = useState(false)
   const { options } = useOptions()
   const { fastRec, highFrameRateRec } = options
+
+  const cleanupFirefoxAudioRef = useRef<() => void>(() => {})
 
   const recorder = useRef<MediaRecorder>()
   const canvasInterval = useRef<number>()
@@ -38,6 +59,10 @@ export function useRecord () {
     // 녹화 시작
     if (newRec) {
       // 고프레임 녹화 시
+      if (isMoz) {
+        cleanupFirefoxAudioRef.current = handleFirefoxAudio(video)
+      }
+
       if (highFrameRateRec) {
         const [_videoRecorder, _canvasInterval] = await startHighFrameRateRecord(video) ?? [null, null, null]
 
@@ -65,6 +90,12 @@ export function useRecord () {
         return
       }
       clearInterval(canvasInterval.current) // 고프레임 녹화 canvas interval 제거
+
+      // Firefox에서 issue 핸들 후 cleanup
+      if (isMoz && cleanupFirefoxAudioRef.current) {
+        cleanupFirefoxAudioRef.current()
+        cleanupFirefoxAudioRef.current = () => {}
+      }
     }
     await _stopRecord(recorder, fastRec)
   }

@@ -46,10 +46,6 @@ export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispa
 
   useEffect(() => {
     if (isMoz) {
-      getRecordInfo()
-        .then((info) => { setRecordInfo(info) })
-        .catch(console.error)
-
       chrome.runtime.onMessage.addListener((message: MozRecordBlob | MozRecordInfo) => {
         if (message.type === 'mozRecordBlob') {
           const blob = new Blob([message.resultBlob], { type: message.resultBlob.type })
