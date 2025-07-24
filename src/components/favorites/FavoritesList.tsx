@@ -27,7 +27,7 @@ const getFollowedChannels = async (): Promise<FollowApiResponse> => {
 export function FavoritesListPortal (): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-list',
-    targetSelector: '[class^="header_service"]',
+    targetSelector: '[class^="navigation_bar_section__"]',
     position: 'after'
   })
 
@@ -105,7 +105,7 @@ function FavoritesList (): React.ReactElement | null {
   }, [])
 
   useEffect(() => {
-    const targetNav = document.querySelector('nav#navigation')
+    const targetNav = document.querySelector('nav.navigation_bar_section__hDpyD')
     if (!targetNav) return
 
     setIsExpanded(targetNav.className.includes('is_expanded'))
@@ -121,60 +121,66 @@ function FavoritesList (): React.ReactElement | null {
   if (favoriteChannels.length === 0) return null
 
   return (
-    <div className={`navigator_wrapper__ruh6f ${isExpanded ? 'navigator_is_expanded__4Q1h9' : ''}`} style={{ paddingBottom: isExpanded ? '5px' : '' }}>
-      {isExpanded
-        ? (
-          <div className='navigator_header__inwmE'>
-            <h2 className='navigator_title__9RhVJ'>팔로우 즐겨찾기 (beta)</h2>
-          </div>
-          )
-        : <h2 className='navigator_title__9RhVJ'>즐겨찾기</h2>}
-      {favoriteChannels.map(channel => (
-        isExpanded
-          ? <ExpandedChannelItem key={channel.channelId} channel={channel} />
-          : <CollapsedChannelItem key={channel.channelId} channel={channel} />
-      ))}
-    </div>
+    <nav className={`navigation_bar_section__hDpyD ${isExpanded ? 'navigation_bar_is_expanded__Z69d7' : ''}`} style={{ paddingBottom: isExpanded ? '5px' : '' }}>
+
+      <div className='navigation_bar_header__3fpfb'>
+        <strong className='navigation_bar_title__1UBnx'> {isExpanded ? '팔로우 즐겨찾기 (beta)' : '즐겨찾기'}</strong>
+      </div>
+
+      <ul className='navigation_bar_list__+d2qh'>
+        {favoriteChannels.map(channel => (
+          isExpanded
+            ? <ExpandedChannelItem key={channel.channelId} channel={channel} />
+            : <CollapsedChannelItem key={channel.channelId} channel={channel} />
+        ))}
+      </ul>
+    </nav>
   )
 }
 
 function ExpandedChannelItem ({ channel }: { channel: FollowingItem }) {
   return (
-    <div className='navigator_list__cHnuV'>
-      <a className='navigator_item__qXlq9' href={`/live/${channel.channelId}`}>
-        <div className={`navigator_profile__kAP2J ${channel.streamer.openLive ? 'navigator_is_live__jJiBO' : 'navigator_default__Hk5Qm'}`}>
+    <li className='navigation_bar_item__4OS5Z'>
+      <a className='navigator_item__mH4JG navigator_type_profile__vtAts navigator_is_expanded__sYbgW' draggable='false' href={`/live/${channel.channelId}`}>
+        <div className={`navigator_profile__dbd9H ${channel.streamer.openLive ? 'navigator_is_live__StrUx' : ''}`}>
           <img
             width='26' height='26'
             src={channel.channel.channelImageUrl ?? 'https://ssl.pstatic.net/cmstatic/nng/img/img_anonymous_square_gray_opacity2x.png?type=f120_120_na'}
-            className={`navigator_image__T5dSp ${!channel.streamer.openLive ? 'navigator_default__Hk5Qm' : ''}`}
+            className={`navigator_image__Zw45c ${!channel.streamer.openLive ? 'navigator_default__H3o8G' : ''}`}
             alt=''
+            draggable='false'
           />
+          {channel.streamer.openLive && <span className='blind'>LIVE</span>}
+          {!channel.streamer.openLive && <span className='blind'>오프라인</span>}
         </div>
-        <div className='navigator_information__cMqxQ'>
-          <strong className='navigator_name__AhZMz'>
-            <span className='name_ellipsis__Hu9B+ name_-nemony_ellipsis__ibvhb'>
+        <div className='navigator_information__sT7qv'>
+          <strong className='navigator_name__k4Sc2'>
+            <span className='name_ellipsis__Hu9B+'>
               <span className='name_text__yQG50'>{channel.channel.channelName}</span>
             </span>
           </strong>
         </div>
       </a>
-    </div>
+    </li>
   )
 }
 
 function CollapsedChannelItem ({ channel }: { channel: FollowingItem }) {
   return (
-    <div className='navigator_list__cHnuV'>
-      <a className='navigator_item__qXlq9' href={`/live/${channel.channelId}`}>
-        <div className={`navigator_profile__kAP2J ${channel.streamer.openLive ? 'navigator_is_live__jJiBO' : 'navigator_default__Hk5Qm'}`}>
+    <li className='navigation_bar_item__4OS5Z'>
+      <a className='navigator_item__mH4JG navigator_type_profile__vtAts' draggable='false' href={`/live/${channel.channelId}`}>
+        <div className={`navigator_profile__dbd9H ${channel.streamer.openLive ? 'navigator_is_live__StrUx' : ''}`}>
           <img
             width='26' height='26'
             src={channel.channel.channelImageUrl ?? 'https://ssl.pstatic.net/cmstatic/nng/img/img_anonymous_square_gray_opacity2x.png?type=f120_120_na'}
-            className={`navigator_image__T5dSp ${!channel.streamer.openLive ? 'navigator_default__Hk5Qm' : ''}`}
-            alt={channel.channel.channelName}
+            className={`navigator_image__Zw45c ${!channel.streamer.openLive ? 'navigator_default__H3o8G' : ''}`}
+            alt=''
+            draggable='false'
           />
+          {channel.streamer.openLive && <span className='blind'>LIVE</span>}
+          {!channel.streamer.openLive && <span className='blind'>{channel.channel.channelName}오프라인</span>}
         </div>
       </a>
-    </div>
+    </li>
   )
 }
