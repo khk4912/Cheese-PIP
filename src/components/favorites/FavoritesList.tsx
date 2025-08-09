@@ -121,12 +121,17 @@ function FavoritesList (): React.ReactElement | null {
   if (favoriteChannels.length === 0) return null
 
   return (
-    <nav className={`navigation_bar_section__hDpyD ${isExpanded ? 'navigation_bar_is_expanded__Z69d7' : ''}`} style={{ paddingBottom: isExpanded ? '5px' : '' }}>
-
+    <nav
+      className={`navigation_bar_section__hDpyD ${isExpanded ? 'navigation_bar_is_expanded__Z69d7' : ''}`}
+      style={{
+        paddingBlock: '10px',
+        borderBlock: '1px solid var(--Border-Neutral-Weak)',
+        marginBottom: '10px'
+      }}
+    >
       <div className='navigation_bar_header__3fpfb'>
-        <strong className='navigation_bar_title__1UBnx'> {isExpanded ? '팔로우 즐겨찾기 (beta)' : '즐겨찾기'}</strong>
+        <strong className='navigation_bar_title__1UBnx'> {isExpanded ? '팔로우 즐겨찾기' : '즐겨찾기'}</strong>
       </div>
-
       <ul className='navigation_bar_list__+d2qh'>
         {favoriteChannels.map(channel => (
           isExpanded
