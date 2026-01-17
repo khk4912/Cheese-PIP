@@ -6,6 +6,7 @@ import type { DownloadMessage } from '../types/message'
 */
 
 export const isMoz = navigator.userAgent.includes('Firefox')
+export const isWhale = navigator.userAgent.includes('Whale')
 
 export const isVODPage = (): boolean => {
   return window.location.pathname.startsWith('/video/')
@@ -32,7 +33,7 @@ export const isShortsPage = (): boolean => {
  * @param ext 다운로드할 파일의 확장자 (optional)
  */
 export async function download (url: string, title: string, ext?: string): Promise<void> {
-  if (isMoz) {
+  if (isMoz || isWhale) {
     const a = document.createElement('a')
     a.href = url
     a.download = sanitizeFileName(`${title.trim()}.${ext ?? 'mp4'}`)
