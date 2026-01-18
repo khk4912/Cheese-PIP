@@ -63,7 +63,6 @@ export default function App (): React.ReactNode {
           <Collapsable
             title='고급 옵션'
             desc='확장 프로그램의 작동 방식에 큰 변화를 주는 옵션들입니다.
-                이 옵션들을 변경하면 오류가 발생할 수 있습니다.
                 옵션을 변경한 후 정상적으로 작동하는지 확인해주세요.'
           >
             <Option>
@@ -94,6 +93,15 @@ export default function App (): React.ReactNode {
                 min={1000}
                 max={25000000}
               />
+            </Option>
+            <Option>
+              <Option.Header
+                title='치지직 클립 생성 (실험)'
+                desc='녹화 완료 후 치지직 클립 생성을 시도합니다.
+                      이 기능 사용으로 발생하는 모든 문제에 대해
+                      Cheese-PIP는 책임지지 않습니다.'
+              />
+              <Option.CheckButton optionID='genChzzkClip' />
             </Option>
           </Collapsable>
 

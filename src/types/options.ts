@@ -10,6 +10,7 @@ interface BooleanOptions {
   preferHQ?: boolean
   autoPIP?: boolean
   favorites?: boolean
+  genChzzkClip?: boolean
 }
 
 export interface OtherOptions {
@@ -29,7 +30,8 @@ export const DEFAULT_OPTIONS: Required<Option> = {
   videoBitsPerSecond: 4000000,
   preferHQ: false,
   autoPIP: true,
-  favorites: false
+  favorites: false,
+  genChzzkClip: false
 }
 
 export interface KeyBindings {
