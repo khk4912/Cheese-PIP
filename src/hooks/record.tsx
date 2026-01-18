@@ -1,3 +1,5 @@
+import { getOption } from '../types/options'
+
 function handleFirefoxAudio (video: HTMLVideoElement): () => void {
   if (!isMoz) {
     return () => {}
@@ -126,6 +128,13 @@ async function _stopRecord (
     return
   }
 
+  const { genChzzkClip } = await getOption()
+  if (genChzzkClip && isLivePage()) {
+    const duration = (info.stopDateTime - info.startDateTime) / 1000
+    generateChzzkClipinfo(duration)
+      .catch(console.error)
+  }
+
   // '영상 빠른 저장' 기능 사용시, 결과 페이지 표시 없이 즉시 다운
   if (fastRec) {
     const video = document.createElement('video')
@@ -160,6 +169,7 @@ async function _stopRecord (
       })()
         .catch(console.error)
     }
+
     return
   }
 
