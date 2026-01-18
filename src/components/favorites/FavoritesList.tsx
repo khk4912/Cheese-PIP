@@ -105,17 +105,28 @@ function FavoritesList (): React.ReactElement | null {
   }, [])
 
   useEffect(() => {
-    const targetNav = document.querySelector('nav.navigation_bar_section__hDpyD')
-    if (!targetNav) return
+    let observer: MutationObserver | null = null
+    let cancelled = false
 
-    setIsExpanded(targetNav.className.includes('is_expanded'))
+    waitForElement('nav[class^="navigation_bar_section__"]')
+      .then((targetNav) => {
+        if (cancelled || !targetNav) return
+        setIsExpanded(targetNav.className.includes('is_expanded'))
 
-    const observer = new MutationObserver(() => {
-      setIsExpanded(targetNav.className.includes('is_expanded'))
-    })
-    observer.observe(targetNav, { attributes: true, attributeFilter: ['class'] })
+        observer = new MutationObserver(() => {
+          setIsExpanded(targetNav.className.includes('is_expanded'))
+        })
+        observer.observe(
+          targetNav,
+          { attributes: true, attributeFilter: ['class'] }
+        )
+      })
+      .catch(console.error)
 
-    return () => observer.disconnect()
+    return () => {
+      cancelled = true
+      observer?.disconnect()
+    }
   }, [])
 
   if (favoriteChannels.length === 0) return null
