@@ -14,6 +14,9 @@ importers:
       '@ffmpeg/util':
         specifier: ^0.12.2
         version: 0.12.2
+      hls-parser:
+        specifier: ^0.16.0
+        version: 0.16.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2096,6 +2099,9 @@ packages:
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
+
+  hls-parser@0.16.0:
+    resolution: {integrity: sha512-jb8tX36Nn49MtvSBTWcQjD4ktwJtzrfOlnI8zpo4zQjTq0ZGmG0RsoCQXwvKQGvt4CBFrs8Q3znq0HoNCpt5BA==}
 
   hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
@@ -5732,6 +5738,8 @@ snapshots:
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
+
+  hls-parser@0.16.0: {}
 
   hookable@5.5.3: {}
 
