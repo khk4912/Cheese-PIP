@@ -1,4 +1,4 @@
-import { FFmpeg } from '@ffmpeg/ffmpeg'
+import { FFmpeg, type FileData } from '@ffmpeg/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
 import { useEffect, useRef, useState } from 'react'
 
@@ -9,6 +9,14 @@ const FFMPEG_OPTION = {
   wasmURL: chrome.runtime.getURL('ffmpeg/ffmpeg-core.wasm'),
   workerURL: chrome.runtime.getURL('ffmpeg/ffmpeg-core.worker.js'),
   classWorkerURL: new URL(workerURL, import.meta.url).href,
+}
+
+function fileDataToBlobPart (data: FileData): BlobPart {
+  if (typeof data === 'string') {
+    return data
+  }
+
+  return new Uint8Array(data)
 }
 
 /**
@@ -91,7 +99,7 @@ async function _transcode (
   await ffmpeg.exec(['-i', 'input.webm', ...args, outputFileName])
   const output = await ffmpeg.readFile(outputFileName)
 
-  return URL.createObjectURL(new Blob([output], { type: type === undefined ? 'video/mp4' : `video/${type}` }))
+  return URL.createObjectURL(new Blob([fileDataToBlobPart(output)], { type: type === undefined ? 'video/mp4' : `video/${type}` }))
 }
 
 /**
@@ -114,7 +122,7 @@ export async function segmentize (ffmpeg: FFmpeg, inputFileURL: string, targetSe
   for (const file of files) {
     if (file.name.startsWith('output') && file.name.endsWith('.mp4')) {
       const data = await ffmpeg.readFile(file.name)
-      output.push(URL.createObjectURL(new Blob([data], { type: 'video/mp4' })))
+      output.push(URL.createObjectURL(new Blob([fileDataToBlobPart(data)], { type: 'video/mp4' })))
     }
   }
 
@@ -138,5 +146,5 @@ export async function trim (ffmpeg: FFmpeg, inputFileURL: string, start: number,
   await ffmpeg.exec(['-i', 'input.webm', '-ss', start.toString(), '-to', end.toString(), '-c', 'copy', 'output.mp4'])
   const output = await ffmpeg.readFile('output.mp4')
 
-  return URL.createObjectURL(new Blob([output], { type: 'video/mp4' }))
+  return URL.createObjectURL(new Blob([fileDataToBlobPart(output)], { type: 'video/mp4' }))
 }
