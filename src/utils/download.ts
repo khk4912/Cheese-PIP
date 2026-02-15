@@ -51,3 +51,10 @@ export async function download (url: string, title: string, ext?: string): Promi
     } satisfies DownloadMessage
   )
 }
+
+export function downloadAtag (url: string, title: string, ext?: string): void {
+  const a = document.createElement('a')
+  a.href = url
+  a.download = sanitizeFileName(`${title.trim()}.${ext ?? 'mp4'}`)
+  a.click()
+}

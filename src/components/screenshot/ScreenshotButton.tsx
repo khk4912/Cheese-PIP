@@ -109,7 +109,6 @@ async function saveOrPreview (dataURL: string): Promise<void> {
   if (screenshotPreview) {
     createDraggablePreview(dataURL, title)
   } else {
-    download(dataURL, sanitizeFileName(title), 'png')
-      .catch(console.error)
+    downloadAtag(dataURL, sanitizeFileName(title), 'png')
   }
 }
