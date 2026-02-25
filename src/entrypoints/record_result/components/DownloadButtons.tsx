@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import type { DownloadInfo } from '../../../types/record_info'
 import { ButtonBase } from './Button'
@@ -15,9 +15,7 @@ export function DownloadButtons (
   const [progressModalState, setProgressModalState] = useState(false)
 
   const isMP4 = downloadInfo?.recordInfo.isMP4 ?? false
-
   const [ffmpeg, isFFmpegReady, progress, setProgress] = useFFmpeg(downloadInfo?.length ?? NaN)
-  useEffect(() => { console.log(isFFmpegReady) }, [isFFmpegReady])
 
   const downloadAfterTranscode = (to: 'MP4' | 'MP4-AAC' | 'GIF' | 'WEBP'): void => {
     setProgress(0)

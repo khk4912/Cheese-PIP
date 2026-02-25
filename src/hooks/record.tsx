@@ -1,7 +1,28 @@
+function handleFirefoxAudio (video: HTMLVideoElement): () => void {
+  if (!isMoz) {
+    return () => {}
+  }
+
+  const ctx = new AudioContext()
+  const stream = new MediaStream()
+
+  video.mozCaptureStream()
+    .getAudioTracks()
+    .forEach((track) => {
+      stream.addTrack(track)
+    })
+  const src = ctx.createMediaStreamSource(stream)
+
+  src.connect(ctx.destination)
+  return () => { ctx.close().catch(console.error) }
+}
+
 export function useRecord () {
   const [isRecording, setIsRecording] = useState(false)
   const { options } = useOptions()
   const { fastRec, highFrameRateRec } = options
+
+  const cleanupFirefoxAudioRef = useRef<() => void>(() => {})
 
   const recorder = useRef<MediaRecorder>()
   const canvasInterval = useRef<number>()
@@ -38,6 +59,10 @@ export function useRecord () {
     // 녹화 시작
     if (newRec) {
       // 고프레임 녹화 시
+      if (isMoz) {
+        cleanupFirefoxAudioRef.current = handleFirefoxAudio(video)
+      }
+
       if (highFrameRateRec) {
         const [_videoRecorder, _canvasInterval] = await startHighFrameRateRecord(video) ?? [null, null, null]
 
@@ -65,6 +90,12 @@ export function useRecord () {
         return
       }
       clearInterval(canvasInterval.current) // 고프레임 녹화 canvas interval 제거
+
+      // Firefox에서 issue 핸들 후 cleanup
+      if (isMoz && cleanupFirefoxAudioRef.current) {
+        cleanupFirefoxAudioRef.current()
+        cleanupFirefoxAudioRef.current = () => {}
+      }
     }
     await _stopRecord(recorder, fastRec)
   }
@@ -135,7 +166,14 @@ async function _stopRecord (
   // '영상 빠른 저장' 미사용시 결과 페이지 표시
   window.open(chrome.runtime.getURL('/record_result.html'))
   setTimeout(() => {
-    if (isMoz) { // Firefox 브라우저에서 녹화 Blob을 메시지로
+    if (isMoz) {
+      // RecordInfo도 전송
+      chrome.runtime.sendMessage({
+        type: 'mozRecordInfo',
+        recordInfo: info
+      }).catch(console.error)
+
+      // Blob을 Firefox에서 Message로 전송
       fetch(info.resultBlobURL)
         .then(res => res.blob())
         .then(blob => {
@@ -146,6 +184,8 @@ async function _stopRecord (
             .catch(console.error)
         })
         .catch(console.error)
+
+      URL.revokeObjectURL(info.resultBlobURL)
     }
   }, 500)
 }

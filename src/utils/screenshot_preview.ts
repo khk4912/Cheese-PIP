@@ -111,8 +111,7 @@ function wrapWithOverlay (img: HTMLImageElement, fileName: string): HTMLDivEleme
   })
 
   downloadButton.addEventListener('click', () => {
-    download(img.src, fileName, 'png')
-      .catch(console.error)
+    downloadAtag(img.src, fileName, 'png')
     overlay.remove()
   })
 

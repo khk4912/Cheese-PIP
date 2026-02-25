@@ -7,10 +7,10 @@ function Footer () {
     <>
       <div className={styles.footer}>
         <div className={styles.footerList}>
-          <a href='https://github.com/khk4912/Cheese-PIP' target='_blank' rel='noopener noreferrer'>
+          <a href='https://github.com/khk4912/Cheese-PIP' target='_blank' rel='noopener noreferrer' tabIndex={-1}>
             <button className={styles.infoButton}>GitHub</button>
           </a>
-          <a href='mailto:kosame@kosame.dev'><button className={styles.infoButton}>문의 (메일)</button></a>
+          <a href='mailto:kosame@kosame.dev' tabIndex={-1}><button className={styles.infoButton}>문의 (메일)</button></a>
         </div>
         <span className={styles.footerText}>
           Cheese-PIP v{VERSION}, Made with ❤️ by kosame. <br />

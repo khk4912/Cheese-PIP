@@ -9,8 +9,19 @@ import style from './Collapsable.module.css'
 export function Collapsable ({ title, desc, children }: { title: string, desc: string, children: React.ReactNode }): React.ReactNode {
   const [isOpen, setIsOpen] = useState(false)
 
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>): void => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      setIsOpen((x) => !x)
+    }
+  }
+
   return (
-    <div className={style.collapsable}>
+    <div
+      className={style.collapsable}
+      tabIndex={0}
+      onKeyDown={onKeyDown}
+    >
       <div className={style.title} onClick={() => { setIsOpen((x) => !x) }}>
         <div
           className={style.arrow}
