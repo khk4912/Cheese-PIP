@@ -5,8 +5,7 @@ const isObject = (x: unknown): x is Record<string, unknown> => {
   return typeof x === 'object' && x !== null
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const checkRecordInfo = (x: any): x is RecordInfo => {
+const checkRecordInfo = (x: unknown): x is RecordInfo => {
   if (!isObject(x)) return false
 
   return (

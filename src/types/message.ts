@@ -1,7 +1,6 @@
 export interface MessageType {
   type: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any
+  data: unknown
 }
 
 export interface DownloadMessage extends MessageType {
