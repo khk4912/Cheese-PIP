@@ -39,7 +39,11 @@ export function injectButton () {
     return
   }
 
-  window.navigation?.addEventListener('navigate', () => {
+  window.navigation?.addEventListener('navigate', (evt) => {
+    if (evt.downloadRequest !== null) {
+      return
+    }
+
     root.unmount()
     div.remove()
 
