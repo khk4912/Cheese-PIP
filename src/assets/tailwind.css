@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+    --color-chzzk-green: #00FFA3;
+    --color-chzzk-bg: #141517;
+}
