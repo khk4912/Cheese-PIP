@@ -2,56 +2,44 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
 import neostandard from 'neostandard'
-import autoImports from './.wxt/eslint-auto-imports.mjs'
+import tseslint from 'typescript-eslint'
+import { defineConfig, globalIgnores } from 'eslint/config'
 
-export default tseslint.config(
-  autoImports,
-  ...neostandard({
-    ignores: [
-      'dist*',
-      'Cheese-PIP-*',
-      'public/**/*',
-      'packages/**/*',
-      '.wxt'
-    ],
+const ignores = ['dist', '.**/*']
+
+export default defineConfig(
+  globalIgnores(ignores),
+  neostandard({
+    ts: true,
+    ignores,
     filesTs: ['**/*.{ts,tsx}'],
-    ts: true
   }),
-  {
-    ignores: [
-      'dist*',
-      'Cheese-PIP-*',
-      'public/**/*',
-      'packages/**/*',
-      '.wxt'
-    ]
-  },
   {
     extends: [
       js.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked
+      ...tseslint.configs.recommendedTypeChecked,
     ],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
-        project: ['./tsconfig.app.json', './tsconfig.node.json'],
-        tsconfigRootDir: import.meta.dirname
-      }
+        project: './tsconfig.json',
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
-      'react-refresh': reactRefresh
+      'react-refresh': reactRefresh,
     },
     rules: {
+      'no-void': 'off',
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': [
         'warn',
-        { allowConstantExport: true }
-      ]
-    }
+        { allowConstantExport: true },
+      ],
+    },
   }
 )
