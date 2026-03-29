@@ -1,0 +1,22 @@
+.advanced-options>summary {
+  list-style: none;
+}
+
+.advanced-options>summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced-options[open] .advanced-options-chevron {
+  transform: rotate(180deg);
+}
+
+.number-input::-webkit-outer-spin-button,
+.number-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.number-input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
