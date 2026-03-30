@@ -27,7 +27,7 @@ const PRIMARY_OPTIONS: BooleanOptionConfig[] = [
   {
     optionKey: 'seek',
     label: '탐색 (← / →)',
-    description: '방송의 이전 / 다음 부분으로 이동합니다.\n(타임머신 기능과 충돌이 발생할 수 있어요.)'
+    description: '방송의 이전 / 다음 부분으로 이동합니다.\n(타임머신 기능과 충돌할 수 있어요.)'
   },
   {
     optionKey: 'fastRec',
@@ -247,8 +247,8 @@ function Footer () {
           <span>GitHub</span>
         </a>
       </p>
-      <p className='text-[10px] text-zinc-600 break-keep mt-2'>
-        Cheese-PIP는 치지직(chzzk)과 관련이 없는 개인 프로젝트입니다.
+      <p className='text-[10px] text-zinc-600 break-keep mt-2 whitespace-pre'>
+        Cheese-PIP는 치지직(chzzk)과 관련이 없는 개인 프로젝트입니다. {'\n'}
         치지직(chzzk)은 네이버 주식회사의 상표입니다.
       </p>
     </footer>
