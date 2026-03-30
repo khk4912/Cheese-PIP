@@ -6,69 +6,6 @@ import type { CheesePIPOptions } from '@/utils/options'
 import { useOptions } from '@/hooks/useOptions'
 
 type BooleanOptionKey = Exclude<keyof CheesePIPOptions, 'videoBitsPerSecond'>
-
-type BooleanOptionConfig = {
-  optionKey: BooleanOptionKey
-  label: string
-  description?: string
-}
-
-const PRIMARY_OPTIONS: BooleanOptionConfig[] = [
-  {
-    optionKey: 'rec',
-    label: '녹화 (R)',
-    description: '녹화 버튼을 추가합니다.\n(장시간 녹화는 권장하지 않아요.)'
-  },
-  {
-    optionKey: 'screenshot',
-    label: '스크린샷 (S)',
-    description: '스크린샷 버튼을 추가합니다.'
-  },
-  {
-    optionKey: 'seek',
-    label: '탐색 (← / →)',
-    description: '방송의 이전 / 다음 부분으로 이동합니다.\n(타임머신 기능과 충돌할 수 있어요.)'
-  },
-  {
-    optionKey: 'fastRec',
-    label: '빠른 저장',
-    description: '영상 녹화 완료 페이지 없이 즉시 녹화 파일을 저장합니다.'
-  },
-  {
-    optionKey: 'screenshotPreview',
-    label: '스크린샷 미리보기',
-    description: '스크린샷을 찍은 후 미리보기를 표시합니다.\n(미리보기를 사용하지 않으면 촬영한 스크린샷은 즉시 저장돼요.)'
-  },
-  {
-    optionKey: 'pip',
-    label: 'PIP+ (P)',
-    description: '기본 PIP 대신 다양한 추가 기능을 제공하는 PIP+를 사용합니다.'
-  },
-  {
-    optionKey: 'preferHQ',
-    label: '자동 최대 해상도',
-    description: '방송 해상도를 최고 품질로 자동으로 변경합니다.'
-  },
-  {
-    optionKey: 'favorites',
-    label: '팔로우 즐겨찾기(베타)',
-    description: '팔로우 중인 스트리머를 사이드바의 즐겨찾기 탭에 추가할 수 있습니다.'
-  },
-]
-
-const ADVANCED_OPTIONS: BooleanOptionConfig[] = [
-  {
-    optionKey: 'preferMP4',
-    label: 'MP4 우선 저장',
-    description: '영상 녹화 시 브라우저가 지원하는 경우 MP4(AAC)로 녹화합니다.'
-  },
-  {
-    optionKey: 'highFrameRateRec',
-    label: '고프레임 녹화',
-    description: '영상 녹화 시 최대 60fps로 녹화합니다.'
-  }
-]
-
 type ToggleProps = {
   optionKey: BooleanOptionKey
   label: string
@@ -178,17 +115,18 @@ function Header () {
 }
 
 function Main () {
+  const { keyBindings } = useOptions()
   return (
     <main className='flex-row items-center w-full text-zinc-50'>
       <div className='grid gap-6 px-4 py-4 mt-3 border border-white/10 rounded-2xl'>
-        {PRIMARY_OPTIONS.map((option) => (
-          <Option
-            key={option.optionKey}
-            optionKey={option.optionKey}
-            label={option.label}
-            description={option.description}
-          />
-        ))}
+        <Option optionKey='rec' label={`녹화 (${keyBindings.rec})`} description={'녹화 버튼을 추가합니다.\n(장시간 녹화는 권장하지 않아요.)'} />
+        <Option optionKey='screenshot' label={`스크린샷 (${keyBindings.screenshot})`} description='스크린샷 버튼을 추가합니다.' />
+        <Option optionKey='seek' label='탐색 (← / →)' description={'방송의 이전 / 다음 부분으로 이동합니다.\n(타임머신 기능과 충돌할 수 있어요.)'} />
+        <Option optionKey='fastRec' label='빠른 저장' description='영상 녹화 완료 페이지 없이 즉시 녹화 파일을 저장합니다.' />
+        <Option optionKey='screenshotPreview' label='스크린샷 미리보기' description={'스크린샷을 찍은 후 미리보기를 표시합니다.\n(미리보기를 사용하지 않으면 촬영한 스크린샷은 즉시 저장돼요.)'} />
+        <Option optionKey='pip' label={`PIP+ (${keyBindings.pip})`} description='기본 PIP 대신 다양한 추가 기능을 제공하는 PIP+를 사용합니다.' />
+        <Option optionKey='preferHQ' label='자동 최대 해상도' description='방송 해상도를 최고 품질로 자동으로 변경합니다.' />
+        <Option optionKey='favorites' label='팔로우 즐겨찾기(베타)' description='팔로우 중인 스트리머를 사이드바의 즐겨찾기 탭에 추가할 수 있습니다.' />
       </div>
 
       <details className='advanced-options mt-3 overflow-hidden rounded-2xl border border-white/10'>
@@ -204,14 +142,9 @@ function Main () {
         </summary>
 
         <div className='grid gap-6 border-t border-white/10 px-4 py-4'>
-          {ADVANCED_OPTIONS.map((option) => (
-            <Option
-              key={option.optionKey}
-              optionKey={option.optionKey}
-              label={option.label}
-              description={option.description}
-            />
-          ))}
+          <Option optionKey='preferMP4' label='MP4 우선 저장' description='영상 녹화 시 브라우저가 지원하는 경우 MP4(AAC)로 녹화합니다.' />
+          <Option optionKey='highFrameRateRec' label='고프레임 녹화' description='영상 녹화 시 최대 60fps로 녹화합니다.' />
+
           <NumberOption
             label='녹화 비트레이트'
             description={'녹화 비트레이트를 설정합니다.\n단위는 bps(초당 비트)입니다.\n(범위: 1000 ~ 25000000)'}
@@ -248,7 +181,7 @@ function Footer () {
         </a>
       </p>
       <p className='text-[10px] text-zinc-600 break-keep mt-2 whitespace-pre'>
-        Cheese-PIP는 치지직(chzzk)과 관련이 없는 개인 프로젝트입니다. {'\n'}
+        Cheese-PIP는 치지직(chzzk)과 관련이 없는 개인 프로젝트입니다.{'\n'}
         치지직(chzzk)은 네이버 주식회사의 상표입니다.
       </p>
     </footer>
