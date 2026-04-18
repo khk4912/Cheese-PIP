@@ -1,6 +1,9 @@
 {
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": "explicit",
-        "source.fixAll.ts": "explicit"
-    }
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.ts": "explicit"
+  },
+  "cSpell.words": ["chzzk", "Pretendard"],
+  "workbench.colorTheme": "Dark Modern"
 }

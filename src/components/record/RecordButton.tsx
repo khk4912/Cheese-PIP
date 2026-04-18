@@ -1,22 +1,25 @@
-import { useState } from 'react'
+import { use, useState } from 'react'
 
 import { CheeseButtonBase } from '../CheeseButtonBase'
 import { useShortcut } from '@/hooks/keyBinding'
 import RecordIcon from '@/assets/static/rec.svg?react'
+import { useRecord } from '@/hooks/record'
 
 const RecordingColor = '#ff6161'
 
 export function RecordButton () {
-  const [isRecording, setIsRecording] = useState(false)
   const { keyBindings } = useOptions()
   const { rec: recKey } = keyBindings
 
+  const { toggle, status } = useRecord()
+  const isRecording = status === 'recording'
+
   useShortcut(recKey, () => {
-    setIsRecording((prev) => !prev)
+    toggle()
   })
 
   const handleClick = () => {
-    setIsRecording((prev) => !prev)
+    toggle()
   }
 
   return (
