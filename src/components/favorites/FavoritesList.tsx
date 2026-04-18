@@ -87,10 +87,7 @@ function FavoritesList (): React.ReactElement | null {
   }, [])
 
   useEffect(() => {
-    const storageChanged = (
-      changes: Record<string, Browser.storage.StorageChange>,
-      areaName: string
-    ): void => {
+    const storageChanged = (changes: { [key: string]: Browser.storage.StorageChange }, areaName: string) => {
       if (areaName !== 'local') return
 
       if (changes.favorites) {
