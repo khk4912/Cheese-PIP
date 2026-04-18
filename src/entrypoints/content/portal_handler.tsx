@@ -1,4 +1,6 @@
 import { useEffect, useMemo } from 'react'
+import { browser } from 'wxt/browser'
+import { isMoz } from '@/utils/download'
 
 const SELECTORS = {
   FAVORITE_BUTTON: '[class*="video_information_alarm"], [class*="channel_profile_alarm"]',
@@ -35,7 +37,7 @@ export function InjectButtons (): React.ReactNode {
   const shouldShowFavorites = options?.favorites
   const shouldShowSeek = (options?.seek ?? false) && !(pageType.isVOD || pageType.isClip)
   const shouldShowVideoControls = pageType.isLive || pageType.isVOD
-  const shouldShowPIP = (options?.pip ?? false) && pageType.isLive
+  const shouldShowPIP = (options?.pip ?? false) && pageType.isLive && !isMoz
   const shouldShowScreenshot = (options?.screenshot ?? false) && !pageType.isClip
   const shouldShowRecord = options?.rec ?? false
 
@@ -64,7 +66,7 @@ function useSeekScript (enabled: boolean, targetReady: boolean) {
     if (!enabled || !targetReady) return
 
     const script = document.createElement('script')
-    script.src = chrome.runtime.getURL('monkeypatch/seek.js')
+    script.src = browser.runtime.getURL('/monkeypatch/seek.js')
     document.body.appendChild(script)
   }, [enabled, targetReady])
 }
