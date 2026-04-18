@@ -1,3 +1,5 @@
+import { browser } from 'wxt/browser'
+
 interface BooleanOptions {
   pip?: boolean
   rec?: boolean
@@ -45,7 +47,7 @@ export const DEFAULT_KEYBINDINGS: Required<KeyBindings> = {
 }
 
 export const getOption = async (): Promise<Required<Option>> => {
-  const option = ((await chrome.storage.local.get('option'))?.option ?? {}) as Option
+  const option = ((await browser.storage.local.get('option'))?.option ?? {}) as Option
   const result = { ...DEFAULT_OPTIONS }
 
   for (const key in option) {
@@ -59,14 +61,14 @@ export const getOption = async (): Promise<Required<Option>> => {
 }
 
 export const setOption = async <T extends keyof Option>(option: T, value: NonNullable<Option[T]>): Promise<void> => {
-  const options = ((await chrome.storage.local.get('option'))?.option ?? {}) as Option
+  const options = ((await browser.storage.local.get('option'))?.option ?? {}) as Option
   options[option] = value
 
-  await chrome.storage.local.set({ option: options })
+  await browser.storage.local.set({ option: options })
 }
 
 export const getKeyBindings = async (): Promise<Required<KeyBindings>> => {
-  const keyBindings = ((await chrome.storage.local.get('keyBindings'))?.keyBindings ?? {}) as KeyBindings
+  const keyBindings = ((await browser.storage.local.get('keyBindings'))?.keyBindings ?? {}) as KeyBindings
   const result = { ...DEFAULT_KEYBINDINGS }
 
   for (const key in keyBindings) {
@@ -80,10 +82,10 @@ export const getKeyBindings = async (): Promise<Required<KeyBindings>> => {
 }
 
 export const setKeyBindings = async <T extends keyof KeyBindings>(key: T, value: NonNullable<KeyBindings[T]>): Promise<void> => {
-  const keyBindings = ((await chrome.storage.local.get('keyBindings'))?.keyBindings ?? {}) as KeyBindings
+  const keyBindings = ((await browser.storage.local.get('keyBindings'))?.keyBindings ?? {}) as KeyBindings
   keyBindings[key] = value
 
-  await chrome.storage.local.set({ keyBindings })
+  await browser.storage.local.set({ keyBindings })
 }
 
 export interface FavoritesList {
@@ -91,7 +93,7 @@ export interface FavoritesList {
 }
 
 export const getFavorites = async (): Promise<Set<string>> => {
-  const { favorites } = (await chrome.storage.local.get('favorites')) as FavoritesList
+  const { favorites } = (await browser.storage.local.get('favorites'))
   return favorites ? new Set(favorites) : new Set<string>()
 }
 
@@ -99,12 +101,12 @@ export const addFavorite = async (channel: string): Promise<void> => {
   const favorites = await getFavorites()
   favorites.add(channel)
 
-  await chrome.storage.local.set({ favorites: Array.from(favorites) })
+  await browser.storage.local.set({ favorites: Array.from(favorites) })
 }
 
 export const removeFavorite = async (channel: string): Promise<void> => {
   const favorites = await getFavorites()
   favorites.delete(channel)
 
-  await chrome.storage.local.set({ favorites: Array.from(favorites) })
+  await browser.storage.local.set({ favorites: Array.from(favorites) })
 }

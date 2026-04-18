@@ -1,13 +1,14 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg'
 import { fetchFile } from '@ffmpeg/util'
 import { useEffect, useRef, useState } from 'react'
+import { browser } from '#imports'
 
 import workerURL from '@ffmpeg/ffmpeg/worker?worker&url'
 
 const FFMPEG_OPTION = {
-  coreURL: chrome.runtime.getURL('ffmpeg/ffmpeg-core.js'),
-  wasmURL: chrome.runtime.getURL('ffmpeg/ffmpeg-core.wasm'),
-  workerURL: chrome.runtime.getURL('ffmpeg/ffmpeg-core.worker.js'),
+  coreURL: browser.runtime.getURL('/ffmpeg/ffmpeg-core.js'),
+  wasmURL: browser.runtime.getURL('/ffmpeg/ffmpeg-core.wasm'),
+  workerURL: browser.runtime.getURL('/ffmpeg/ffmpeg-core.worker.js'),
   classWorkerURL: new URL(workerURL, import.meta.url).href,
 }
 

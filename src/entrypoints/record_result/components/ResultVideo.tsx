@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import type { DownloadInfo, RecordInfo } from '../../../types/record_info'
+import { browser } from 'wxt/browser'
 
 const isMoz = navigator.userAgent.includes('Firefox')
 
@@ -46,7 +47,7 @@ export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispa
 
   useEffect(() => {
     if (isMoz) {
-      chrome.runtime.onMessage.addListener((message: MozRecordBlob | MozRecordInfo) => {
+      const listener = (message: MozRecordBlob | MozRecordInfo): void => {
         if (message.type === 'mozRecordBlob') {
           const blob = new Blob([message.resultBlob], { type: message.resultBlob.type })
           const url = URL.createObjectURL(blob)
@@ -65,7 +66,13 @@ export function ResultVideo ({ setDownloadInfo }: { setDownloadInfo: React.Dispa
             video.src = info.resultBlobURL
           }
         }
-      })
+      }
+
+      browser.runtime.onMessage.addListener(listener)
+
+      return () => {
+        browser.runtime.onMessage.removeListener(listener)
+      }
     } else {
       getRecordInfo()
         .then(setRecordInfo)

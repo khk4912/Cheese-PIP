@@ -1,4 +1,5 @@
 import type { DownloadMessage } from '../types/message'
+import { browser } from 'wxt/browser'
 
 /*
   현재 페이지가 VOD, Clip, Shorts(새로운 클립 페이지) 페이지인지
@@ -41,7 +42,7 @@ export async function download (url: string, title: string, ext?: string): Promi
     return
   }
 
-  await chrome.runtime.sendMessage(
+  await browser.runtime.sendMessage(
     {
       type: 'download',
       data: {

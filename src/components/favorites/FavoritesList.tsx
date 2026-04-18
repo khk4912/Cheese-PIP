@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom'
 import { useEffect, useState } from 'react'
 import { FollowApiResponse, FollowingItem } from '@/types/follows'
 import { getFavorites, removeFavorite } from '@/types/options'
+import { browser, type Browser } from 'wxt/browser'
 
 const getFollowedChannels = async (): Promise<FollowApiResponse> => {
   const res = await fetch(
@@ -86,7 +87,10 @@ function FavoritesList (): React.ReactElement | null {
   }, [])
 
   useEffect(() => {
-    const storageChanged = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
+    const storageChanged = (
+      changes: Record<string, Browser.storage.StorageChange>,
+      areaName: string
+    ): void => {
       if (areaName !== 'local') return
 
       if (changes.favorites) {
@@ -97,10 +101,10 @@ function FavoritesList (): React.ReactElement | null {
     fetchFavorites().catch(console.log)
 
     // storage change event listener 등록
-    chrome.storage.onChanged.addListener(storageChanged)
+    browser.storage.onChanged.addListener(storageChanged)
 
     return () => {
-      chrome.storage.onChanged.removeListener(storageChanged)
+      browser.storage.onChanged.removeListener(storageChanged)
     }
   }, [])
 

@@ -1,5 +1,6 @@
 import { createContext } from 'react'
 import type { RecordInfo } from '../types/record_info'
+import { browser } from 'wxt/browser'
 
 const isObject = (x: unknown): x is Record<string, unknown> => {
   return typeof x === 'object' && x !== null
@@ -28,11 +29,11 @@ const DEFAULT_RECORD_INFO: RecordInfo = {
 } // 기본으로 사용되는 RecordInfo
 
 export const setRecordInfo = async (info: RecordInfo): Promise<void> => {
-  await chrome.storage.local.set({ recordInfo: info })
+  await browser.storage.local.set({ recordInfo: info })
 }
 
 export const getRecordInfo = async (): Promise<RecordInfo> => {
-  const data = await chrome.storage.local.get('recordInfo')
+  const data = await browser.storage.local.get('recordInfo')
 
   if (typeof data.recordInfo !== 'object') {
     console.error('recordInfo is corrupted!')
@@ -50,11 +51,11 @@ export const getRecordInfo = async (): Promise<RecordInfo> => {
 }
 
 export const setTempBlobURL = async (url: string): Promise<void> => {
-  await chrome.storage.local.set({ tempBlobURL: url })
+  await browser.storage.local.set({ tempBlobURL: url })
 }
 
 export const getTempBlobURL = async (): Promise<string> => {
-  const { tempBlobURL } = await chrome.storage.local.get('tempBlobURL') as { tempBlobURL: string }
+  const { tempBlobURL } = await browser.storage.local.get('tempBlobURL')
   return tempBlobURL
 }
 

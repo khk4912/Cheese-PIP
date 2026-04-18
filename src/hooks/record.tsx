@@ -1,3 +1,5 @@
+import { browser } from 'wxt/browser'
+
 function handleFirefoxAudio (video: HTMLVideoElement): () => void {
   if (!isMoz) {
     return () => {}
@@ -164,11 +166,11 @@ async function _stopRecord (
   }
 
   // '영상 빠른 저장' 미사용시 결과 페이지 표시
-  window.open(chrome.runtime.getURL('/record_result.html'))
+  window.open(browser.runtime.getURL('/record_result.html'))
   setTimeout(() => {
     if (isMoz) {
       // RecordInfo도 전송
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         type: 'mozRecordInfo',
         recordInfo: info
       }).catch(console.error)
@@ -177,7 +179,7 @@ async function _stopRecord (
       fetch(info.resultBlobURL)
         .then(res => res.blob())
         .then(blob => {
-          chrome.runtime.sendMessage({
+          browser.runtime.sendMessage({
             type: 'mozRecordBlob',
             resultBlob: blob
           })
