@@ -35,7 +35,8 @@ export function createDraggablePreview (
     max-width: 500px;
     `
 
-  const target = document.querySelector('[class^="toolbar_container"]') ??
+  const target = document.querySelector('[class^="_glive"]') ??
+                 document.querySelector('[class^="toolbar_container"]') ??
                  document.querySelector('[class^="layout_glive"]')
 
   if (target === null) {

@@ -7,13 +7,16 @@ import type { StreamInfo } from '../types/record_info'
  * @returns StreamInfo
  */
 export const getStreamInfo = (document: Document): StreamInfo => {
-  const streamerName = document.querySelector("[class^='video_information'] > [class^='name_ellipsis'] > [class^='name_text']")?.textContent ??
+  const streamerName = document.querySelector("div[class^='_channel_'] span[class^='_text_']")?.textContent ??
+                       document.querySelector("[class^='video_information'] > [class^='name_ellipsis'] > [class^='name_text']")?.textContent ??
                        document.querySelector("[class^='live_information'] > [class^='name_ellipsis']> [class^='name_text']")?.textContent ??
                        'streamer'
 
-  const streamTitle = document.querySelector("[class^='video_information_title']")?.textContent ??
+  const streamTitle = document.querySelector("div[class^='_details_'] h2[class^='_title_']")?.textContent ??
+                      document.querySelector("[class^='video_information_title']")?.textContent ??
                       document.querySelector("[class^='live_information_player_title']")?.textContent ??
                       'title'
 
+  console.log('Stream Info', { streamerName, streamTitle })
   return { streamerName, streamTitle }
 }

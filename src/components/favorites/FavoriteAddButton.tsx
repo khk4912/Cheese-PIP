@@ -26,7 +26,7 @@ const StarIcon = ({ fill = StrokeColor.dark, checked = false } : { fill?: string
 export function FavoritesButtonPortal (): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-add-button',
-    targetSelector: '[class*="video_information_alarm"], [class*="channel_profile_alarm"]',
+    targetSelector: '[class*="_control"] > button, [class*="_action_"] > button',
     position: 'before'
   })
 
@@ -72,7 +72,8 @@ function FavoritesButton () {
   }
 
   useEffect(() => {
-    const button = document.querySelector('[class*="button_capsule"')
+    const button = document.querySelector('[class^="_has_tooltip_box"] > button') ??
+      document.querySelector('[class^="_follow_"] > button')
     if (!button) return
 
     // button의 innerText가 '팔로우'가 되면 visible -> false, '팔로잉'이면 visible -> true
@@ -111,7 +112,7 @@ function FavoritesButton () {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           onClick={handleChange}
-          type='button' className='button_container__x044H button_medium__r15mw button_circle__lcf+O button_dark__cw8hT'
+          type='button' className='_container_1dexx_2 _icon_container_1dexx_415 _larger_1dexx_213'
           style={{ marginRight: '6px' }}
         >
           <div
@@ -120,9 +121,9 @@ function FavoritesButton () {
             <StarIcon fill={StrokeColor[theme]} checked={checked} />
           </div>
           {isHover &&
-            <span className='button_label__31nEZ button_top__EerI-'>Cheese-PIP 즐겨찾기</span>}
+            <span className='_label_1dexx_588 _label_top_1dexx_606 _label_center_1dexx_615'>Cheese-PIP 즐겨찾기</span>}
         </button>
-        {toastVisible && <p className='toast_container__6QVkr toast_type_fixed__DfGkX' role='alert'>이 스트리머를 즐겨찾기 리스트에 추가합니다.</p>}
+        {toastVisible && <p className='_container_1r77n_1 _type_fixed_1r77n_36' role='alert'>이 스트리머를 즐겨찾기 리스트에 추가합니다.</p>}
       </>
   )
 }

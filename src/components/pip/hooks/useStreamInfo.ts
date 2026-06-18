@@ -19,7 +19,7 @@ export function useStreamInfo (originalDocument: Document) {
   useEffect(() => {
     const getInfo = () => {
       const infos = getStreamInfo(originalDocument)
-      const preViewerCount = originalDocument.querySelector('[class^="video_information_count"]')?.textContent ??
+      const preViewerCount = originalDocument.querySelector('[class^="_data"] > [class^="_count_"]')?.textContent ??
                             originalDocument.querySelector('[class^="live_information_player_count"]')?.textContent ?? '0'
       const viewerCount = preViewerCount ? parseInt(preViewerCount.replace(/[^0-9]/g, '')) : 0
 

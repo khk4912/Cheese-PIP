@@ -28,7 +28,7 @@ const getFollowedChannels = async (): Promise<FollowApiResponse> => {
 export function FavoritesListPortal (): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-list',
-    targetSelector: '[class^="navigation_bar_section__"]',
+    targetSelector: 'div[class^="_content_"] > nav[class^="_section_"]',
     position: 'after'
   })
 
@@ -109,7 +109,7 @@ function FavoritesList (): React.ReactElement | null {
     let observer: MutationObserver | null = null
     let cancelled = false
 
-    waitForElement('nav[class^="navigation_bar_section__"]')
+    waitForElement('aside._container_1vdxf_2')
       .then((targetNav) => {
         if (cancelled || !targetNav) return
         setIsExpanded(targetNav.className.includes('is_expanded'))
@@ -134,17 +134,17 @@ function FavoritesList (): React.ReactElement | null {
 
   return (
     <nav
-      className={`navigation_bar_section__hDpyD ${isExpanded ? 'navigation_bar_is_expanded__Z69d7' : ''}`}
+      className={`_section_q99ll_26 ${isExpanded ? '_is_expanded_q99ll_47' : ''}`}
       style={{
         paddingBlock: '10px',
         borderBlock: '1px solid var(--Border-Neutral-Weak)',
         marginBottom: '10px'
       }}
     >
-      <div className='navigation_bar_header__3fpfb'>
-        <strong className='navigation_bar_title__1UBnx'> {isExpanded ? '팔로우 즐겨찾기' : '즐겨찾기'}</strong>
+      <div className='_header_q99ll_47'>
+        <strong className='_title_q99ll_56'> {isExpanded ? '팔로우 즐겨찾기' : '즐겨찾기'}</strong>
       </div>
-      <ul className='navigation_bar_list__+d2qh'>
+      <ul className='_list_q99ll_53'>
         {favoriteChannels.map(channel => (
           isExpanded
             ? <ExpandedChannelItem key={channel.channelId} channel={channel} />
@@ -155,49 +155,115 @@ function FavoritesList (): React.ReactElement | null {
   )
 }
 
+const DEFAULT_PROFILE_URL =
+  'https://ssl.pstatic.net/static/nng/glive/image/default_profile_dark.png'
+
 function ExpandedChannelItem ({ channel }: { channel: FollowingItem }) {
+  const isLive = channel.streamer.openLive
+
+  const originalImageUrl = channel.channel.channelImageUrl?.trim()
+  const usesDefaultImage = !originalImageUrl
+
+  const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
+
+  const channelHref = isLive
+    ? `/live/${channel.channel.channelId}`
+    : `/${channel.channel.channelId}`
+
   return (
-    <li className='navigation_bar_item__4OS5Z'>
-      <a className='navigator_item__mH4JG navigator_type_profile__vtAts navigator_is_expanded__sYbgW' draggable='false' href={`/live/${channel.channelId}`}>
-        <div className={`navigator_profile__dbd9H ${channel.streamer.openLive ? 'navigator_is_live__StrUx' : ''}`}>
+    <li className='_item_q99ll_63'>
+      <div className='_item_1lz65_45 _type_profile_1lz65_66 _is_expanded_1lz65_66'>
+        <div
+          className={[
+            '_profile_1lz65_52',
+            isLive ? '_is_live_1lz65_146' : ''
+          ].filter(Boolean).join(' ')}
+        >
           <img
-            width='26' height='26'
-            src={channel.channel.channelImageUrl ?? 'https://ssl.pstatic.net/cmstatic/nng/img/img_anonymous_square_gray_opacity2x.png?type=f120_120_na'}
-            className={`navigator_image__Zw45c ${!channel.streamer.openLive ? 'navigator_default__H3o8G' : ''}`}
+            width={26}
+            height={26}
+            src={channelImageUrl}
+            className={
+              !isLive && !usesDefaultImage
+                ? '_default_1lz65_157'
+                : ''
+            }
             alt=''
-            draggable='false'
+            draggable={false}
           />
-          {channel.streamer.openLive && <span className='blind'>LIVE</span>}
-          {!channel.streamer.openLive && <span className='blind'>오프라인</span>}
+
+          <span className='blind'>
+            {isLive ? 'LIVE' : '오프라인'}
+          </span>
         </div>
-        <div className='navigator_information__sT7qv'>
-          <strong className='navigator_name__k4Sc2'>
-            <span className='name_ellipsis__Hu9B+'>
-              <span className='name_text__yQG50'>{channel.channel.channelName}</span>
+
+        <div className='_information_1lz65_179'>
+          <strong className='_name_1lz65_74'>
+            <span className='_ellipsis_dtc6c_6'>
+              <span className='_text_dtc6c_2'>
+                {channel.channel.channelName}
+              </span>
             </span>
           </strong>
         </div>
-      </a>
+
+        <a
+          className='_item_link_1lz65_108'
+          draggable={false}
+          href={channelHref}
+          aria-label={channel.channel.channelName}
+        />
+      </div>
     </li>
   )
 }
-
 function CollapsedChannelItem ({ channel }: { channel: FollowingItem }) {
+  const isLive = channel.streamer.openLive
+  const originalImageUrl = channel.channel.channelImageUrl?.trim()
+  const hasCustomImage = Boolean(originalImageUrl)
+
+  const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
+
+  const channelHref = isLive
+    ? `/live/${channel.channel.channelId}`
+    : `/${channel.channel.channelId}`
+
   return (
-    <li className='navigation_bar_item__4OS5Z'>
-      <a className='navigator_item__mH4JG navigator_type_profile__vtAts' draggable='false' href={`/live/${channel.channelId}`}>
-        <div className={`navigator_profile__dbd9H ${channel.streamer.openLive ? 'navigator_is_live__StrUx' : ''}`}>
+    <li className='_item_q99ll_63'>
+      <div className='_item_1lz65_45 _type_profile_1lz65_66'>
+        <div
+          className={[
+            '_profile_1lz65_52',
+            isLive ? '_is_live_1lz65_146' : ''
+          ].filter(Boolean).join(' ')}
+        >
           <img
-            width='26' height='26'
-            src={channel.channel.channelImageUrl ?? 'https://ssl.pstatic.net/cmstatic/nng/img/img_anonymous_square_gray_opacity2x.png?type=f120_120_na'}
-            className={`navigator_image__Zw45c ${!channel.streamer.openLive ? 'navigator_default__H3o8G' : ''}`}
+            width={26}
+            height={26}
+            src={channelImageUrl}
+            className={
+              !isLive && hasCustomImage
+                ? '_default_1lz65_157'
+                : undefined
+            }
             alt=''
-            draggable='false'
+            draggable={false}
           />
-          {channel.streamer.openLive && <span className='blind'>LIVE</span>}
-          {!channel.streamer.openLive && <span className='blind'>{channel.channel.channelName}오프라인</span>}
+
+          <span className='blind'>
+            {isLive
+              ? 'LIVE'
+              : `${channel.channel.channelName}오프라인`}
+          </span>
         </div>
-      </a>
+
+        <a
+          className='_item_link_1lz65_108'
+          draggable={false}
+          href={channelHref}
+          aria-label={channel.channel.channelName}
+        />
+      </div>
     </li>
   )
 }
