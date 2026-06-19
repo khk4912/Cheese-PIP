@@ -12,7 +12,7 @@ export default defineConfig({
     exclude: ['.DS_Store']
   },
   manifest: {
-    name: 'Cheese-PIP',
+    name: 'Cheese-PIP - 치지직 도구',
     description: '치지직에 녹화, 스크린샷 등 다양한 기능을 추가합니다.',
     action: {
       default_title: 'Cheese-PIP'
