@@ -1,29 +1,7 @@
 import ReactDOM from 'react-dom'
-import { useEffect, useState } from 'react'
-import { FollowApiResponse, FollowingItem } from '@/types/follows'
-import { getFavorites, removeFavorite } from '@/types/options'
+import { useEffect, useState, type SyntheticEvent } from 'react'
+import { getFavoriteChannels, type FavoriteChannel } from '@/types/options'
 import { browser, type Browser } from 'wxt/browser'
-
-const getFollowedChannels = async (): Promise<FollowApiResponse> => {
-  const res = await fetch(
-    'https://api.chzzk.naver.com/service/v1/channels/followings?page=0&size=505&sortType=FOLLOW',
-    { credentials: 'include' }
-  )
-  // check 401
-  if (res.status !== 200) {
-    return {
-      code: res.status,
-      message: 'Error',
-      content: {
-        totalCount: 0,
-        totalPage: 0,
-        followingList: []
-      }
-    }
-  }
-
-  return (await res.json()) as FollowApiResponse
-}
 
 export function FavoritesListPortal (): React.ReactNode {
   const target = usePortal({
@@ -52,39 +30,15 @@ function FavoritesListPortalContainer ({ target, children }: { target: HTMLEleme
 
 function FavoritesList (): React.ReactElement | null {
   const [isExpanded, setIsExpanded] = useState(true)
-  const [favoriteChannels, setFavoriteChannels] = useState<FollowingItem[]>([])
+  const [favoriteChannels, setFavoriteChannels] = useState<FavoriteChannel[]>([])
 
   const fetchFavorites = async () => {
     try {
-      const favorites = await getFavorites()
-      const res = await getFollowedChannels()
-      const followingChannels = res.content.followingList
-
-      // 즐겨찾기에 추가된 채널만 필터링
-      const favoriteChannels = followingChannels.filter(channel => favorites.has(channel.channelId))
-
-      // favorites 에는 있지만, followingChannels 에는 없는 경우 favorites에서 삭제
-      const followingChannelIds = followingChannels.map(channel => channel.channelId)
-      const toRemove = [...favorites].filter(channelId => !followingChannelIds.includes(channelId))
-
-      await Promise.all(toRemove.map(channelId => removeFavorite(channelId)))
-      toRemove.forEach(channelId => favorites.delete(channelId))
-
-      // openLive 가 true 인 채널을 위로 정렬
-      favoriteChannels.sort((a, _) => (a.streamer.openLive ? -1 : 1))
-      setFavoriteChannels(favoriteChannels)
+      setFavoriteChannels(await getFavoriteChannels())
     } catch (error) {
       console.log(error)
     }
   }
-
-  useEffect(() => {
-    const interval = setInterval(() => { fetchFavorites().catch(console.log) }, 30000)
-
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [])
 
   useEffect(() => {
     const storageChanged = (changes: { [key: string]: Browser.storage.StorageChange }, areaName: string) => {
@@ -142,7 +96,7 @@ function FavoritesList (): React.ReactElement | null {
       }}
     >
       <div className='_header_q99ll_47'>
-        <strong className='_title_q99ll_56'> {isExpanded ? '팔로우 즐겨찾기' : '즐겨찾기'}</strong>
+        <strong className='_title_q99ll_56'> {isExpanded ? '스트리머 즐겨찾기' : '즐겨찾기'}</strong>
       </div>
       <ul className='_list_q99ll_53'>
         {favoriteChannels.map(channel => (
@@ -158,42 +112,43 @@ function FavoritesList (): React.ReactElement | null {
 const DEFAULT_PROFILE_URL =
   'https://ssl.pstatic.net/static/nng/glive/image/default_profile_dark.png'
 
-function ExpandedChannelItem ({ channel }: { channel: FollowingItem }) {
-  const isLive = channel.streamer.openLive
+const handleProfileImageError = (event: SyntheticEvent<HTMLImageElement>) => {
+  if (event.currentTarget.src === DEFAULT_PROFILE_URL) return
 
-  const originalImageUrl = channel.channel.channelImageUrl?.trim()
+  event.currentTarget.src = DEFAULT_PROFILE_URL
+  event.currentTarget.className = ''
+}
+
+function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
+  const originalImageUrl = channel.channelImageUrl?.trim()
   const usesDefaultImage = !originalImageUrl
 
   const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
 
-  const channelHref = isLive
-    ? `/live/${channel.channel.channelId}`
-    : `/${channel.channel.channelId}`
+  const channelHref = `/${channel.channelId}`
 
   return (
     <li className='_item_q99ll_63'>
       <div className='_item_1lz65_45 _type_profile_1lz65_66 _is_expanded_1lz65_66'>
         <div
-          className={[
-            '_profile_1lz65_52',
-            isLive ? '_is_live_1lz65_146' : ''
-          ].filter(Boolean).join(' ')}
+          className='_profile_1lz65_52'
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
             className={
-              !isLive && !usesDefaultImage
+              !usesDefaultImage
                 ? '_default_1lz65_157'
                 : ''
             }
             alt=''
             draggable={false}
+            onError={handleProfileImageError}
           />
 
           <span className='blind'>
-            {isLive ? 'LIVE' : '오프라인'}
+            {`${channel.channelName} 프로필`}
           </span>
         </div>
 
@@ -201,7 +156,7 @@ function ExpandedChannelItem ({ channel }: { channel: FollowingItem }) {
           <strong className='_name_1lz65_74'>
             <span className='_ellipsis_dtc6c_6'>
               <span className='_text_dtc6c_2'>
-                {channel.channel.channelName}
+                {channel.channelName}
               </span>
             </span>
           </strong>
@@ -211,49 +166,42 @@ function ExpandedChannelItem ({ channel }: { channel: FollowingItem }) {
           className='_item_link_1lz65_108'
           draggable={false}
           href={channelHref}
-          aria-label={channel.channel.channelName}
+          aria-label={channel.channelName}
         />
       </div>
     </li>
   )
 }
-function CollapsedChannelItem ({ channel }: { channel: FollowingItem }) {
-  const isLive = channel.streamer.openLive
-  const originalImageUrl = channel.channel.channelImageUrl?.trim()
+function CollapsedChannelItem ({ channel }: { channel: FavoriteChannel }) {
+  const originalImageUrl = channel.channelImageUrl?.trim()
   const hasCustomImage = Boolean(originalImageUrl)
 
   const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
 
-  const channelHref = isLive
-    ? `/live/${channel.channel.channelId}`
-    : `/${channel.channel.channelId}`
+  const channelHref = `/${channel.channelId}`
 
   return (
     <li className='_item_q99ll_63'>
       <div className='_item_1lz65_45 _type_profile_1lz65_66'>
         <div
-          className={[
-            '_profile_1lz65_52',
-            isLive ? '_is_live_1lz65_146' : ''
-          ].filter(Boolean).join(' ')}
+          className='_profile_1lz65_52'
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
             className={
-              !isLive && hasCustomImage
+              hasCustomImage
                 ? '_default_1lz65_157'
                 : undefined
             }
             alt=''
             draggable={false}
+            onError={handleProfileImageError}
           />
 
           <span className='blind'>
-            {isLive
-              ? 'LIVE'
-              : `${channel.channel.channelName}오프라인`}
+            {`${channel.channelName} 프로필`}
           </span>
         </div>
 
@@ -261,7 +209,7 @@ function CollapsedChannelItem ({ channel }: { channel: FollowingItem }) {
           className='_item_link_1lz65_108'
           draggable={false}
           href={channelHref}
-          aria-label={channel.channel.channelName}
+          aria-label={channel.channelName}
         />
       </div>
     </li>

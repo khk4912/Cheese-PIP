@@ -1,10 +1,17 @@
 import ReactDOM from 'react-dom'
-import { addFavorite, getFavorites, removeFavorite } from '@/types/options'
+import { addFavorite, getFavorites, removeFavorite, type FavoriteChannel } from '@/types/options'
 
 const StrokeColor = {
   dark: 'rgb(223,226,234)',
   light: 'rgb(46,48,51)'
 } as const
+
+const FAVORITES_BUTTON_TARGET_SELECTOR = [
+  '[class*="_control"] > button',
+  '[class*="_action_"] > button',
+  '[class*="video_information_alarm"]',
+  '[class*="channel_profile_alarm"]',
+].join(', ')
 
 const StarIcon = ({ fill = StrokeColor.dark, checked = false } : { fill?: string, checked?: boolean }) =>
   <>
@@ -26,7 +33,7 @@ const StarIcon = ({ fill = StrokeColor.dark, checked = false } : { fill?: string
 export function FavoritesButtonPortal (): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-add-button',
-    targetSelector: '[class*="_control"] > button, [class*="_action_"] > button',
+    targetSelector: FAVORITES_BUTTON_TARGET_SELECTOR,
     position: 'before'
   })
 
@@ -41,8 +48,23 @@ function FavoritesPortalContainer ({ target, children }: { target: Element | nul
   return target ? ReactDOM.createPortal(children, target) : null
 }
 
+const getMetaContent = (selector: string): string | null =>
+  document.querySelector<HTMLMetaElement>(selector)?.content?.trim() || null
+
+const getCurrentChannel = (channelId: string): FavoriteChannel => {
+  const title = getMetaContent('meta[property="og:title"]') ?? document.title
+  const channelName = title
+    .replace(/\s*[-|]\s*(CHZZK|치지직).*$/i, '')
+    .trim() || channelId
+
+  return {
+    channelId,
+    channelName,
+    channelImageUrl: getMetaContent('meta[property="og:image"]')
+  }
+}
+
 function FavoritesButton () {
-  const [visible, setVisible] = useState(true)
   const [isHover, setIsHover] = useState(false)
   const [checked, setChecked] = useState(false)
   const [toastVisible, setToastVisible] = useState(false)
@@ -59,34 +81,19 @@ function FavoritesButton () {
   }
 
   const handleChange = () => {
+    if (!channelID) return
+
     const newChecked = !checked
     setChecked(newChecked)
 
     if (newChecked) {
-      channelID && addFavorite(channelID).catch(() => { })
+      addFavorite(getCurrentChannel(channelID)).catch(() => { })
       setToastVisible(true)
       setTimeout(() => setToastVisible(false), 2000)
     } else {
-      channelID && removeFavorite(channelID).catch(() => { })
+      removeFavorite(channelID).catch(() => { })
     }
   }
-
-  useEffect(() => {
-    const button = document.querySelector('[class^="_has_tooltip_box"] > button') ??
-      document.querySelector('[class^="_follow_"] > button')
-    if (!button) return
-
-    // button의 innerText가 '팔로우'가 되면 visible -> false, '팔로잉'이면 visible -> true
-    const observer = new MutationObserver(() => {
-      setVisible(button.textContent?.startsWith('팔로잉') ?? false)
-    })
-
-    observer.observe(button, { childList: true, subtree: true })
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [])
 
   useEffect(() => {
     const _getFavorites = async () => {
@@ -98,32 +105,24 @@ function FavoritesButton () {
   }
   , [channelID])
 
-  useEffect(() => {
-    if (!visible) {
-      setChecked(false)
-      channelID && removeFavorite(channelID).catch(() => { })
-    }
-  }, [visible, channelID])
-
   return (
-    visible &&
-      <>
-        <button
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          onClick={handleChange}
-          type='button' className='_container_1dexx_2 _icon_container_1dexx_415 _larger_1dexx_213'
-          style={{ marginRight: '6px' }}
+    <>
+      <button
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={handleChange}
+        type='button' className='_container_1dexx_2 _icon_container_1dexx_415 _larger_1dexx_213'
+        style={{ marginRight: '6px' }}
+      >
+        <div
+          title='Cheese-PIP 즐겨찾기' role='img' aria-label='animation'
         >
-          <div
-            title='Cheese-PIP 즐겨찾기' role='img' aria-label='animation'
-          >
-            <StarIcon fill={StrokeColor[theme]} checked={checked} />
-          </div>
-          {isHover &&
-            <span className='_label_1dexx_588 _label_top_1dexx_606 _label_center_1dexx_615'>Cheese-PIP 즐겨찾기</span>}
-        </button>
-        {toastVisible && <p className='_container_1r77n_1 _type_fixed_1r77n_36' role='alert'>이 스트리머를 즐겨찾기 리스트에 추가합니다.</p>}
-      </>
+          <StarIcon fill={StrokeColor[theme]} checked={checked} />
+        </div>
+        {isHover &&
+          <span className='_label_1dexx_588 _label_top_1dexx_606 _label_center_1dexx_615'>Cheese-PIP 즐겨찾기</span>}
+      </button>
+      {toastVisible && <p className='_container_1r77n_1 _type_fixed_1r77n_36' role='alert'>이 스트리머를 즐겨찾기 리스트에 추가합니다.</p>}
+    </>
   )
 }
