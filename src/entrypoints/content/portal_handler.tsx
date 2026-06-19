@@ -34,7 +34,7 @@ export function InjectButtons (): React.ReactNode {
   // 최고 화질 선호 설정
   usePreferHQ(options?.preferHQ ?? false)
 
-  const shouldShowFavorites = options?.favorites
+  const shouldShowFavorites = (options?.favorites ?? false) && !(pageType.isVOD || pageType.isClip)
   const shouldShowSeek = (options?.seek ?? false) && !(pageType.isVOD || pageType.isClip)
   const shouldShowVideoControls = pageType.isLive || pageType.isVOD
   const shouldShowPIP = (options?.pip ?? false) && pageType.isLive && !isMoz
