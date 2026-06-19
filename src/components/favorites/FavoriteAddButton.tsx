@@ -60,7 +60,8 @@ const getCurrentChannel = (channelId: string): FavoriteChannel => {
   return {
     channelId,
     channelName,
-    channelImageUrl: getMetaContent('meta[property="og:image"]')
+    channelImageUrl: getMetaContent('meta[property="og:image"]'),
+    openLive: false
   }
 }
 

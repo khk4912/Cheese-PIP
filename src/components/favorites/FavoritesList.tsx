@@ -120,25 +120,31 @@ const handleProfileImageError = (event: SyntheticEvent<HTMLImageElement>) => {
 }
 
 function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
+  const isLive = channel.openLive
   const originalImageUrl = channel.channelImageUrl?.trim()
   const usesDefaultImage = !originalImageUrl
 
   const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
 
-  const channelHref = `/${channel.channelId}`
+  const channelHref = isLive
+    ? `/live/${channel.channelId}`
+    : `/${channel.channelId}`
 
   return (
     <li className='_item_q99ll_63'>
       <div className='_item_1lz65_45 _type_profile_1lz65_66 _is_expanded_1lz65_66'>
         <div
-          className='_profile_1lz65_52'
+          className={[
+            '_profile_1lz65_52',
+            isLive ? '_is_live_1lz65_146' : ''
+          ].filter(Boolean).join(' ')}
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
             className={
-              !usesDefaultImage
+              !isLive && !usesDefaultImage
                 ? '_default_1lz65_157'
                 : ''
             }
@@ -148,7 +154,7 @@ function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
           />
 
           <span className='blind'>
-            {`${channel.channelName} 프로필`}
+            {isLive ? 'LIVE' : `${channel.channelName} 프로필`}
           </span>
         </div>
 
@@ -173,25 +179,31 @@ function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
   )
 }
 function CollapsedChannelItem ({ channel }: { channel: FavoriteChannel }) {
+  const isLive = channel.openLive
   const originalImageUrl = channel.channelImageUrl?.trim()
   const hasCustomImage = Boolean(originalImageUrl)
 
   const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
 
-  const channelHref = `/${channel.channelId}`
+  const channelHref = isLive
+    ? `/live/${channel.channelId}`
+    : `/${channel.channelId}`
 
   return (
     <li className='_item_q99ll_63'>
       <div className='_item_1lz65_45 _type_profile_1lz65_66'>
         <div
-          className='_profile_1lz65_52'
+          className={[
+            '_profile_1lz65_52',
+            isLive ? '_is_live_1lz65_146' : ''
+          ].filter(Boolean).join(' ')}
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
             className={
-              hasCustomImage
+              !isLive && hasCustomImage
                 ? '_default_1lz65_157'
                 : undefined
             }
@@ -201,7 +213,7 @@ function CollapsedChannelItem ({ channel }: { channel: FavoriteChannel }) {
           />
 
           <span className='blind'>
-            {`${channel.channelName} 프로필`}
+            {isLive ? 'LIVE' : `${channel.channelName} 프로필`}
           </span>
         </div>
 

@@ -92,6 +92,7 @@ export interface FavoriteChannel {
   channelId: string
   channelName: string
   channelImageUrl: string | null
+  openLive: boolean
 }
 
 interface ChannelApiResponse {
@@ -101,6 +102,17 @@ interface ChannelApiResponse {
     channelId: string
     channelName: string
     channelImageUrl: string | null
+  } | null
+}
+
+interface LiveDetailApiResponse {
+  content: {
+    status: string | null
+    channel?: {
+      channelId: string
+      channelName: string
+      channelImageUrl: string | null
+    }
   } | null
 }
 
@@ -135,7 +147,30 @@ const fetchChannel = async (channelId: string): Promise<FavoriteChannel | null> 
   return {
     channelId: data.content.channelId,
     channelName: data.content.channelName,
-    channelImageUrl: data.content.channelImageUrl
+    channelImageUrl: data.content.channelImageUrl,
+    openLive: false
+  }
+}
+
+const fetchLiveDetail = async (channelId: string): Promise<FavoriteChannel | null> => {
+  const res = await fetch(`https://api.chzzk.naver.com/service/v3.3/channels/${channelId}/live-detail`, {
+    cache: 'no-store',
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json'
+    },
+    mode: 'cors'
+  })
+  if (!res.ok) return null
+
+  const data = (await res.json()) as LiveDetailApiResponse
+  if (!data.content) return null
+
+  return {
+    channelId: data.content.channel?.channelId ?? channelId,
+    channelName: data.content.channel?.channelName ?? channelId,
+    channelImageUrl: data.content.channel?.channelImageUrl ?? null,
+    openLive: data.content.status === 'OPEN'
   }
 }
 
@@ -161,15 +196,24 @@ const getFavoriteIds = async (): Promise<string[]> => {
 export const getFavoriteChannels = async (): Promise<FavoriteChannel[]> => {
   const favoriteIds = await getFavoriteIds()
 
-  return await Promise.all(
-    favoriteIds.map(async channelId => (
-      await fetchChannel(channelId).catch(() => null) ?? {
-        channelId,
-        channelName: channelId,
-        channelImageUrl: null
+  const favoriteChannels = await Promise.all(
+    favoriteIds.map(async channelId => {
+      const liveDetail = await fetchLiveDetail(channelId).catch(() => null)
+      const channel = liveDetail ?? await fetchChannel(channelId).catch(() => null)
+
+      return {
+        ...(channel ?? {
+          channelId,
+          channelName: channelId,
+          channelImageUrl: null,
+          openLive: false
+        }),
+        openLive: liveDetail?.openLive ?? false
       }
-    ))
+    })
   )
+
+  return favoriteChannels.sort((a, b) => Number(b.openLive) - Number(a.openLive))
 }
 
 export const getFavorites = async (): Promise<Set<string>> => {
