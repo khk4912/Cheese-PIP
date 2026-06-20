@@ -20,7 +20,9 @@ export function useStreamInfo (originalDocument: Document) {
     const getInfo = () => {
       const infos = getStreamInfo(originalDocument)
       const preViewerCount = originalDocument.querySelector('[class^="_data"] > [class^="_count_"]')?.textContent ??
-                            originalDocument.querySelector('[class^="live_information_player_count"]')?.textContent ?? '0'
+                             originalDocument.querySelector('[class^="_data"] > [class^="_count_"]')?.textContent ??
+                             originalDocument.querySelector('[class^="_view_"] > strong[class^="_count_"]')?.textContent ?? '0'
+
       const viewerCount = preViewerCount ? parseInt(preViewerCount.replace(/[^0-9]/g, '')) : 0
 
       setStreamInfo({
