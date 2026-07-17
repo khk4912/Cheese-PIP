@@ -66,20 +66,10 @@ const getCurrentChannel = (channelId: string): FavoriteChannel => {
 }
 
 function FavoritesButton () {
-  const [isHover, setIsHover] = useState(false)
   const [checked, setChecked] = useState(false)
-  const [toastVisible, setToastVisible] = useState(false)
 
   const channelID = window.location.pathname.split('/').at(-1)
   const theme = useThemeContext()
-
-  const handleMouseEnter = () => {
-    setIsHover(true)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHover(false)
-  }
 
   const handleChange = () => {
     if (!channelID) return
@@ -89,8 +79,6 @@ function FavoritesButton () {
 
     if (newChecked) {
       addFavorite(getCurrentChannel(channelID)).catch(() => { })
-      setToastVisible(true)
-      setTimeout(() => setToastVisible(false), 2000)
     } else {
       removeFavorite(channelID).catch(() => { })
     }
@@ -109,21 +97,18 @@ function FavoritesButton () {
   return (
     <>
       <button
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         onClick={handleChange}
-        type='button' className='_container_1dexx_2 _icon_container_1dexx_415 _larger_1dexx_213'
+        type='button'
+        className='_container_pk61h_2 _icon_container_pk61h_415 _larger_pk61h_213'
         style={{ marginRight: '6px' }}
+        aria-label='Cheese-PIP 즐겨찾기'
+        aria-pressed={checked}
+        title='Cheese-PIP 즐겨찾기'
       >
-        <div
-          title='Cheese-PIP 즐겨찾기' role='img' aria-label='animation'
-        >
+        <span aria-hidden='true'>
           <StarIcon fill={StrokeColor[theme]} checked={checked} />
-        </div>
-        {isHover &&
-          <span className='_label_1dexx_588 _label_top_1dexx_606 _label_center_1dexx_615'>Cheese-PIP 즐겨찾기</span>}
+        </span>
       </button>
-      {toastVisible && <p className='_container_1r77n_1 _type_fixed_1r77n_36' role='alert'>이 스트리머를 즐겨찾기 리스트에 추가합니다.</p>}
     </>
   )
 }

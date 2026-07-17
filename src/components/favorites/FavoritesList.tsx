@@ -6,30 +6,18 @@ import { browser, type Browser } from 'wxt/browser'
 export function FavoritesListPortal (): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-list',
-    targetSelector: 'div[class^="_content_"] > nav[class^="_section_"]',
+    targetSelector: '#sidebar nav',
     position: 'after'
   })
 
-  return (
-    <FavoritesListPortalContainer target={target}>
-      <FavoritesList />
-    </FavoritesListPortalContainer>
-  )
+  return ReactDOM.createPortal(<FavoritesList />, target)
 }
 
-// Portal 컨테이너 컴포넌트
-function FavoritesListPortalContainer ({ target, children }: { target: HTMLElement, children: React.ReactNode }) {
-  useEffect(() => {
-    return () => {
-      target.remove()
-    }
-  }, [target])
-
-  return ReactDOM.createPortal(children, target)
-}
+const isSidebarExpanded = (sidebar: Element): boolean =>
+  sidebar.classList.contains('_is_expanded_1u7am_12')
 
 function FavoritesList (): React.ReactElement | null {
-  const [isExpanded, setIsExpanded] = useState(true)
+  const [isExpanded, setIsExpanded] = useState(false)
   const [favoriteChannels, setFavoriteChannels] = useState<FavoriteChannel[]>([])
 
   const fetchFavorites = async () => {
@@ -50,37 +38,41 @@ function FavoritesList (): React.ReactElement | null {
     }
 
     fetchFavorites().catch(console.log)
-
-    // storage change event listener 등록
     browser.storage.onChanged.addListener(storageChanged)
 
-    return () => {
-      browser.storage.onChanged.removeListener(storageChanged)
-    }
+    return () => browser.storage.onChanged.removeListener(storageChanged)
   }, [])
 
   useEffect(() => {
-    let observer: MutationObserver | null = null
+    let mutationObserver: MutationObserver | null = null
+    let resizeObserver: ResizeObserver | null = null
     let cancelled = false
 
-    waitForElement('aside._container_1vdxf_2')
-      .then((targetNav) => {
-        if (cancelled || !targetNav) return
-        setIsExpanded(targetNav.className.includes('is_expanded'))
+    waitForElement('#sidebar')
+      .then(sidebar => {
+        if (cancelled) return
 
-        observer = new MutationObserver(() => {
-          setIsExpanded(targetNav.className.includes('is_expanded'))
+        const updateExpandedState = () => {
+          setIsExpanded(isSidebarExpanded(sidebar))
+        }
+
+        updateExpandedState()
+
+        mutationObserver = new MutationObserver(updateExpandedState)
+        resizeObserver = new ResizeObserver(updateExpandedState)
+
+        mutationObserver.observe(sidebar, {
+          attributes: true,
+          attributeFilter: ['class']
         })
-        observer.observe(
-          targetNav,
-          { attributes: true, attributeFilter: ['class'] }
-        )
+        resizeObserver.observe(sidebar)
       })
       .catch(console.error)
 
     return () => {
       cancelled = true
-      observer?.disconnect()
+      mutationObserver?.disconnect()
+      resizeObserver?.disconnect()
     }
   }, [])
 
@@ -88,21 +80,21 @@ function FavoritesList (): React.ReactElement | null {
 
   return (
     <nav
-      className={`_section_q99ll_26 ${isExpanded ? '_is_expanded_q99ll_47' : ''}`}
-      style={{
-        paddingBlock: '10px',
-        borderBlock: '1px solid var(--Border-Neutral-Weak)',
-        marginBottom: '10px'
-      }}
+      aria-label='스트리머 즐겨찾기'
+      className={`_section_30v9l_26 ${isExpanded ? '_is_expanded_30v9l_47' : ''}`}
     >
-      <div className='_header_q99ll_47'>
-        <strong className='_title_q99ll_56'> {isExpanded ? '스트리머 즐겨찾기' : '즐겨찾기'}</strong>
+      <div className='_header_30v9l_47'>
+        <strong className='_title_30v9l_56'>
+          {isExpanded ? '스트리머 즐겨찾기' : '즐겨찾기'}
+        </strong>
       </div>
-      <ul className='_list_q99ll_53'>
+      <ul className='_list_30v9l_53'>
         {favoriteChannels.map(channel => (
-          isExpanded
-            ? <ExpandedChannelItem key={channel.channelId} channel={channel} />
-            : <CollapsedChannelItem key={channel.channelId} channel={channel} />
+          <ChannelItem
+            key={channel.channelId}
+            channel={channel}
+            isExpanded={isExpanded}
+          />
         ))}
       </ul>
     </nav>
@@ -119,35 +111,34 @@ const handleProfileImageError = (event: SyntheticEvent<HTMLImageElement>) => {
   event.currentTarget.className = ''
 }
 
-function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
+function ChannelItem ({ channel, isExpanded }: { channel: FavoriteChannel, isExpanded: boolean }) {
   const isLive = channel.openLive
   const originalImageUrl = channel.channelImageUrl?.trim()
-  const usesDefaultImage = !originalImageUrl
-
   const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
-
   const channelHref = isLive
     ? `/live/${channel.channelId}`
     : `/${channel.channelId}`
 
   return (
-    <li className='_item_q99ll_63'>
-      <div className='_item_1lz65_45 _type_profile_1lz65_66 _is_expanded_1lz65_66'>
+    <li className='_item_30v9l_63'>
+      <div
+        className={[
+          '_item_2us73_45',
+          '_type_profile_2us73_66',
+          isExpanded ? '_is_expanded_2us73_66' : ''
+        ].filter(Boolean).join(' ')}
+      >
         <div
           className={[
-            '_profile_1lz65_52',
-            isLive ? '_is_live_1lz65_146' : ''
+            '_profile_2us73_52',
+            isLive ? '_is_live_2us73_146' : ''
           ].filter(Boolean).join(' ')}
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
-            className={
-              !isLive && !usesDefaultImage
-                ? '_default_1lz65_157'
-                : ''
-            }
+            className={!isLive && originalImageUrl ? '_default_2us73_157' : ''}
             alt=''
             draggable={false}
             onError={handleProfileImageError}
@@ -158,67 +149,16 @@ function ExpandedChannelItem ({ channel }: { channel: FavoriteChannel }) {
           </span>
         </div>
 
-        <div className='_information_1lz65_179'>
-          <strong className='_name_1lz65_74'>
-            <span className='_ellipsis_dtc6c_6'>
-              <span className='_text_dtc6c_2'>
-                {channel.channelName}
-              </span>
-            </span>
-          </strong>
-        </div>
+        {isExpanded && (
+          <div className='_information_2us73_179'>
+            <strong className='_name_2us73_74 _ellipsis_2us73_194'>
+              {channel.channelName}
+            </strong>
+          </div>
+        )}
 
         <a
-          className='_item_link_1lz65_108'
-          draggable={false}
-          href={channelHref}
-          aria-label={channel.channelName}
-        />
-      </div>
-    </li>
-  )
-}
-function CollapsedChannelItem ({ channel }: { channel: FavoriteChannel }) {
-  const isLive = channel.openLive
-  const originalImageUrl = channel.channelImageUrl?.trim()
-  const hasCustomImage = Boolean(originalImageUrl)
-
-  const channelImageUrl = originalImageUrl || DEFAULT_PROFILE_URL
-
-  const channelHref = isLive
-    ? `/live/${channel.channelId}`
-    : `/${channel.channelId}`
-
-  return (
-    <li className='_item_q99ll_63'>
-      <div className='_item_1lz65_45 _type_profile_1lz65_66'>
-        <div
-          className={[
-            '_profile_1lz65_52',
-            isLive ? '_is_live_1lz65_146' : ''
-          ].filter(Boolean).join(' ')}
-        >
-          <img
-            width={26}
-            height={26}
-            src={channelImageUrl}
-            className={
-              !isLive && hasCustomImage
-                ? '_default_1lz65_157'
-                : undefined
-            }
-            alt=''
-            draggable={false}
-            onError={handleProfileImageError}
-          />
-
-          <span className='blind'>
-            {isLive ? 'LIVE' : `${channel.channelName} 프로필`}
-          </span>
-        </div>
-
-        <a
-          className='_item_link_1lz65_108'
+          className='_item_link_2us73_108'
           draggable={false}
           href={channelHref}
           aria-label={channel.channelName}
