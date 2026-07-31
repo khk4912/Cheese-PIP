@@ -1,13 +1,13 @@
 .collapsable {
-  margin-left: 1vw;
-  margin-bottom: 5vh;
+  margin-left: 3px;
+  margin-bottom: 25px;
   cursor: pointer;
 }
 
 #title {
   font-size: large;
   margin-left: 0.3rem;
-  margin-bottom: 1vh;
+  margin-bottom: 5px;
 }
 
 #desc {
@@ -18,9 +18,9 @@
 }
 
 .arrow {
-  margin-bottom: 0.5vh;
+  margin-bottom: 2.5px;
 }
 
 .content {
-  margin-top: 2vh;
+  margin-top: 10px;
 }

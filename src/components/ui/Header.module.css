@@ -6,16 +6,16 @@
   width: 100%;
   height: 20%;
 
-  margin-top: 3vh;
+  margin-top: 15px;
 }
 
 #logo-img {
-  margin-top: 3vh;
-  height: 13vh;
+  margin-top: 15px;
+  height: 65px;
 }
 
 #logo {
-  margin-top: 3vh;
+  margin-top: 15px;
   font-size: large;
   font-weight: bold;
   text-align: center;
@@ -23,5 +23,5 @@
 
 #desc {
   font-size: small;
-  margin-top: 1vh;
+  margin-top: 5px;
 }
