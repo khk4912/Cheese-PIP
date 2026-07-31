@@ -14,7 +14,7 @@ export function FavoritesListPortal (): React.ReactNode {
 }
 
 const isSidebarExpanded = (sidebar: Element): boolean =>
-  sidebar.classList.contains('_is_expanded_1u7am_12')
+  sidebar.classList.contains('_is_expanded_1v5jt_12')
 
 function FavoritesList (): React.ReactElement | null {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -123,22 +123,22 @@ function ChannelItem ({ channel, isExpanded }: { channel: FavoriteChannel, isExp
     <li className='_item_30v9l_63'>
       <div
         className={[
-          '_item_2us73_45',
-          '_type_profile_2us73_66',
-          isExpanded ? '_is_expanded_2us73_66' : ''
+          '_item_1vqt1_45',
+          '_type_profile_1vqt1_66',
+          isExpanded ? '_is_expanded_1vqt1_66' : ''
         ].filter(Boolean).join(' ')}
       >
         <div
           className={[
-            '_profile_2us73_52',
-            isLive ? '_is_live_2us73_146' : ''
+            '_profile_1vqt1_52',
+            isLive ? '_is_live_1vqt1_146' : ''
           ].filter(Boolean).join(' ')}
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
-            className={!isLive && originalImageUrl ? '_default_2us73_157' : ''}
+            className={!isLive && originalImageUrl ? '_default_1vqt1_157' : ''}
             alt=''
             draggable={false}
             onError={handleProfileImageError}
@@ -150,15 +150,19 @@ function ChannelItem ({ channel, isExpanded }: { channel: FavoriteChannel, isExp
         </div>
 
         {isExpanded && (
-          <div className='_information_2us73_179'>
-            <strong className='_name_2us73_74 _ellipsis_2us73_194'>
-              {channel.channelName}
+          <div className='_information_1vqt1_179'>
+            <strong className='_name_1vqt1_74'>
+              <span className='_ellipsis_1iatj_6'>
+                <span className='_text_1iatj_2'>
+                  {channel.channelName}
+                </span>
+              </span>
             </strong>
           </div>
         )}
 
         <a
-          className='_item_link_2us73_108'
+          className='_item_link_1vqt1_108'
           draggable={false}
           href={channelHref}
           aria-label={channel.channelName}
