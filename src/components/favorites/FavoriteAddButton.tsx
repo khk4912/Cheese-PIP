@@ -1,17 +1,17 @@
 import ReactDOM from 'react-dom'
 import { addFavorite, getFavorites, removeFavorite, type FavoriteChannel } from '@/types/options'
+import type { FavoritePageContext } from '@/utils/favorite_page'
+import styles from './FavoriteAddButton.module.css'
 
 const StrokeColor = {
   dark: 'rgb(223,226,234)',
   light: 'rgb(46,48,51)'
 } as const
 
-const FAVORITES_BUTTON_TARGET_SELECTOR = [
-  '[class*="_control"] > button',
-  '[class*="_action_"] > button',
-  '[class*="video_information_alarm"]',
-  '[class*="channel_profile_alarm"]',
-].join(', ')
+const FAVORITES_BUTTON_TARGET_SELECTORS: Record<FavoritePageContext['page'], string> = {
+  live: '[class*="_control_"] > button',
+  channel: '[class*="_action_"] > button'
+}
 
 const StarIcon = ({ fill = StrokeColor.dark, checked = false } : { fill?: string, checked?: boolean }) =>
   <>
@@ -30,16 +30,16 @@ const StarIcon = ({ fill = StrokeColor.dark, checked = false } : { fill?: string
     </svg>
   </>
 
-export function FavoritesButtonPortal (): React.ReactNode {
+export function FavoritesButtonPortal ({ context }: { context: FavoritePageContext }): React.ReactNode {
   const target = usePortal({
     id: 'cheese-pip-favorites-add-button',
-    targetSelector: FAVORITES_BUTTON_TARGET_SELECTOR,
+    targetSelector: FAVORITES_BUTTON_TARGET_SELECTORS[context.page],
     position: 'before'
   })
 
   return (
     <FavoritesPortalContainer target={target}>
-      <FavoritesButton />
+      <FavoritesButton context={context} />
     </FavoritesPortalContainer>
   )
 }
@@ -65,42 +65,43 @@ const getCurrentChannel = (channelId: string): FavoriteChannel => {
   }
 }
 
-function FavoritesButton () {
+function FavoritesButton ({ context }: { context: FavoritePageContext }) {
   const [checked, setChecked] = useState(false)
 
-  const channelID = window.location.pathname.split('/').at(-1)
   const theme = useThemeContext()
+  const className = [
+    styles.favoriteButton,
+    styles[theme],
+    context.page === 'channel' ? styles.channelPage : ''
+  ].filter(Boolean).join(' ')
 
   const handleChange = () => {
-    if (!channelID) return
-
     const newChecked = !checked
     setChecked(newChecked)
 
     if (newChecked) {
-      addFavorite(getCurrentChannel(channelID)).catch(() => { })
+      addFavorite(getCurrentChannel(context.channelId)).catch(() => { })
     } else {
-      removeFavorite(channelID).catch(() => { })
+      removeFavorite(context.channelId).catch(() => { })
     }
   }
 
   useEffect(() => {
     const _getFavorites = async () => {
       const favorites = await getFavorites()
-      setChecked(favorites.has(channelID ?? ''))
+      setChecked(favorites.has(context.channelId))
     }
 
     _getFavorites().catch(() => { })
   }
-  , [channelID])
+  , [context.channelId])
 
   return (
     <>
       <button
         onClick={handleChange}
         type='button'
-        className='_container_pk61h_2 _icon_container_pk61h_415 _larger_pk61h_213'
-        style={{ marginRight: '6px' }}
+        className={className}
         aria-label='Cheese-PIP 즐겨찾기'
         aria-pressed={checked}
         title='Cheese-PIP 즐겨찾기'

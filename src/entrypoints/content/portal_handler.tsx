@@ -1,9 +1,9 @@
 import { useEffect, useMemo } from 'react'
 import { browser } from 'wxt/browser'
 import { isMoz } from '@/utils/download'
+import { getFavoritePageContext } from '@/utils/favorite_page'
 
 const SELECTORS = {
-  FAVORITE_BUTTON: '[class*="video_information_alarm"], [class*="channel_profile_alarm"]',
   CONTROL_BUTTONS: '.pzp-pc__bottom-buttons-right'
 } as const
 
@@ -34,7 +34,9 @@ export function InjectButtons (): React.ReactNode {
   // 최고 화질 선호 설정
   usePreferHQ(options?.preferHQ ?? false)
 
-  const shouldShowFavorites = (options?.favorites ?? false) && !(pageType.isVOD || pageType.isClip)
+  const favoritePageContext = (options?.favorites ?? false)
+    ? getFavoritePageContext(window.location.pathname)
+    : null
   const shouldShowSeek = (options?.seek ?? false) && !(pageType.isVOD || pageType.isClip)
   const shouldShowVideoControls = pageType.isLive || pageType.isVOD
   const shouldShowPIP = (options?.pip ?? false) && pageType.isLive && !isMoz
@@ -44,7 +46,7 @@ export function InjectButtons (): React.ReactNode {
   return (
     <>
       {/* 즐겨찾기 버튼 */}
-      {shouldShowFavorites && <FavoritesButtonPortal />}
+      {favoritePageContext && <FavoritesButtonPortal context={favoritePageContext} />}
 
       {/* Seek 포털 */}
       {shouldShowSeek && <SeekPortal />}

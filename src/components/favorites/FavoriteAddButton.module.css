@@ -1,0 +1,44 @@
+.favoriteButton {
+  box-sizing: border-box;
+  display: flex;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  vertical-align: top;
+  transition: background-color 120ms ease;
+}
+
+.favoriteButton svg {
+  display: block;
+}
+
+.favoriteButton:focus-visible {
+  outline: 2px solid rgb(0, 255, 163);
+  outline-offset: 2px;
+}
+
+.dark {
+  background-color: rgb(46, 48, 51);
+}
+
+.dark:hover {
+  background-color: rgb(68, 70, 74);
+}
+
+.light {
+  background-color: rgb(239, 240, 243);
+}
+
+.light:hover {
+  background-color: rgb(223, 226, 234);
+}
+
+.channelPage {
+  margin-right: 6px;
+}
