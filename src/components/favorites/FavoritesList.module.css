@@ -1,0 +1,142 @@
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
+}
+
+.expanded {
+  padding-inline: 0;
+}
+
+.collapsed {
+  padding-inline: 0;
+}
+
+.header {
+  box-sizing: border-box;
+  display: flex;
+  height: 26px;
+  align-items: center;
+  margin: 0;
+  padding: 5px;
+}
+
+.title {
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  color: rgb(105 113 131);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 16px;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.expanded .title {
+  text-align: left;
+}
+
+.collapsed .title {
+  width: 100%;
+  font-size: 11px;
+  letter-spacing: -0.5px;
+  text-align: center;
+}
+
+.list {
+  display: block;
+  margin: 5px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  height: 42px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemLink {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 42px;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  border-radius: 8px;
+  color: rgb(201 206 220);
+  text-decoration: none;
+}
+
+.itemLink:hover {
+  background-color: rgb(255 255 255 / 6%);
+}
+
+.itemLink:focus-visible {
+  outline: 2px solid rgb(0 255 163);
+  outline-offset: -2px;
+}
+
+.collapsed .itemLink {
+  justify-content: center;
+  gap: 0;
+  padding: 5px 0;
+}
+
+.profile {
+  box-sizing: border-box;
+  position: relative;
+  display: block;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  padding: 1px;
+  border-radius: 50%;
+}
+
+.profile.live {
+  background:
+    linear-gradient(rgb(20 21 23), rgb(20 21 23)) content-box,
+    linear-gradient(rgb(0 255 163) 0%, rgb(2 127 128) 100%) border-box;
+}
+
+.profile::after {
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgb(255 255 255 / 5%);
+  border-radius: 50%;
+  content: '';
+  pointer-events: none;
+}
+
+.profileImage {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: 2px;
+  border-radius: 50%;
+  background-color: rgb(46 48 51);
+  object-fit: cover;
+}
+
+.name {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  margin: 0;
+  color: rgb(201 206 220);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

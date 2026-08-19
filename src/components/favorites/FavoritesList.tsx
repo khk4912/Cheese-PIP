@@ -2,6 +2,7 @@ import ReactDOM from 'react-dom'
 import { useEffect, useState, type SyntheticEvent } from 'react'
 import { getFavoriteChannels, type FavoriteChannel } from '@/types/options'
 import { browser, type Browser } from 'wxt/browser'
+import styles from './FavoritesList.module.css'
 
 export function FavoritesListPortal (): React.ReactNode {
   const target = usePortal({
@@ -13,8 +14,10 @@ export function FavoritesListPortal (): React.ReactNode {
   return ReactDOM.createPortal(<FavoritesList />, target)
 }
 
+const EXPANDED_SIDEBAR_MIN_WIDTH = 120
+
 const isSidebarExpanded = (sidebar: Element): boolean =>
-  sidebar.classList.contains('_is_expanded_1v5jt_12')
+  sidebar.getBoundingClientRect().width >= EXPANDED_SIDEBAR_MIN_WIDTH
 
 function FavoritesList (): React.ReactElement | null {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -44,7 +47,6 @@ function FavoritesList (): React.ReactElement | null {
   }, [])
 
   useEffect(() => {
-    let mutationObserver: MutationObserver | null = null
     let resizeObserver: ResizeObserver | null = null
     let cancelled = false
 
@@ -58,20 +60,13 @@ function FavoritesList (): React.ReactElement | null {
 
         updateExpandedState()
 
-        mutationObserver = new MutationObserver(updateExpandedState)
         resizeObserver = new ResizeObserver(updateExpandedState)
-
-        mutationObserver.observe(sidebar, {
-          attributes: true,
-          attributeFilter: ['class']
-        })
         resizeObserver.observe(sidebar)
       })
       .catch(console.error)
 
     return () => {
       cancelled = true
-      mutationObserver?.disconnect()
       resizeObserver?.disconnect()
     }
   }, [])
@@ -81,14 +76,17 @@ function FavoritesList (): React.ReactElement | null {
   return (
     <nav
       aria-label='스트리머 즐겨찾기'
-      className={`_section_30v9l_26 ${isExpanded ? '_is_expanded_30v9l_47' : ''}`}
+      className={[
+        styles.root,
+        isExpanded ? styles.expanded : styles.collapsed
+      ].join(' ')}
     >
-      <div className='_header_30v9l_47'>
-        <strong className='_title_30v9l_56'>
+      <div className={styles.header}>
+        <strong className={styles.title}>
           {isExpanded ? '스트리머 즐겨찾기' : '즐겨찾기'}
         </strong>
       </div>
-      <ul className='_list_30v9l_53'>
+      <ul className={styles.list}>
         {favoriteChannels.map(channel => (
           <ChannelItem
             key={channel.channelId}
@@ -108,7 +106,6 @@ const handleProfileImageError = (event: SyntheticEvent<HTMLImageElement>) => {
   if (event.currentTarget.src === DEFAULT_PROFILE_URL) return
 
   event.currentTarget.src = DEFAULT_PROFILE_URL
-  event.currentTarget.className = ''
 }
 
 function ChannelItem ({ channel, isExpanded }: { channel: FavoriteChannel, isExpanded: boolean }) {
@@ -120,54 +117,36 @@ function ChannelItem ({ channel, isExpanded }: { channel: FavoriteChannel, isExp
     : `/${channel.channelId}`
 
   return (
-    <li className='_item_30v9l_63'>
-      <div
-        className={[
-          '_item_1vqt1_45',
-          '_type_profile_1vqt1_66',
-          isExpanded ? '_is_expanded_1vqt1_66' : ''
-        ].filter(Boolean).join(' ')}
+    <li className={styles.item}>
+      <a
+        className={styles.itemLink}
+        draggable={false}
+        href={channelHref}
+        aria-label={`${channel.channelName}${isLive ? ', 실시간 방송 중' : ''}`}
       >
         <div
           className={[
-            '_profile_1vqt1_52',
-            isLive ? '_is_live_1vqt1_146' : ''
+            styles.profile,
+            isLive ? styles.live : ''
           ].filter(Boolean).join(' ')}
         >
           <img
             width={26}
             height={26}
             src={channelImageUrl}
-            className={!isLive && originalImageUrl ? '_default_1vqt1_157' : ''}
+            className={styles.profileImage}
             alt=''
             draggable={false}
             onError={handleProfileImageError}
           />
-
-          <span className='blind'>
-            {isLive ? 'LIVE' : `${channel.channelName} 프로필`}
-          </span>
         </div>
 
         {isExpanded && (
-          <div className='_information_1vqt1_179'>
-            <strong className='_name_1vqt1_74'>
-              <span className='_ellipsis_1iatj_6'>
-                <span className='_text_1iatj_2'>
-                  {channel.channelName}
-                </span>
-              </span>
-            </strong>
-          </div>
+          <strong className={styles.name}>
+            {channel.channelName}
+          </strong>
         )}
-
-        <a
-          className='_item_link_1vqt1_108'
-          draggable={false}
-          href={channelHref}
-          aria-label={channel.channelName}
-        />
-      </div>
+      </a>
     </li>
   )
 }
