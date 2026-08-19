@@ -16,6 +16,22 @@
   padding-inline: 0;
 }
 
+.root::after {
+  display: block;
+  height: 1px;
+  margin: 5px auto 10px;
+  background-color: rgb(68 68 68);
+  content: '';
+}
+
+.expanded::after {
+  width: calc(100% - 10px);
+}
+
+.collapsed::after {
+  width: 32px;
+}
+
 .header {
   box-sizing: border-box;
   display: flex;
@@ -43,6 +59,7 @@
 
 .collapsed .title {
   width: 100%;
+  color: rgb(147 155 172);
   font-size: 11px;
   letter-spacing: -0.5px;
   text-align: center;
@@ -109,6 +126,12 @@
     linear-gradient(rgb(0 255 163) 0%, rgb(2 127 128) 100%) border-box;
 }
 
+.profile:not(.live) {
+  background:
+    linear-gradient(rgb(20 21 23), rgb(20 21 23)) content-box,
+    linear-gradient(rgb(77 77 77), rgb(77 77 77)) border-box;
+}
+
 .profile::after {
   position: absolute;
   inset: 3px;
@@ -126,6 +149,10 @@
   border-radius: 50%;
   background-color: rgb(46 48 51);
   object-fit: cover;
+}
+
+.profile:not(.live) .profileImage {
+  filter: grayscale(1);
 }
 
 .name {
