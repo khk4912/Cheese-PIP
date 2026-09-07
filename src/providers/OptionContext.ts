@@ -5,6 +5,9 @@ export type OptionContextValue = {
   options: CheesePIPOptions
   keyBindings: Required<KeyBindings>
   isLoading: boolean
+  isReady: boolean
+  isSaving: boolean
+  error: string | null
   updateOption: <K extends keyof CheesePIPOptions>(
     key: K,
     value: CheesePIPOptions[K]
