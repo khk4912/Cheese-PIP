@@ -27,10 +27,13 @@ function Option({ optionKey, label, description }: ToggleProps) {
           </p>
         )}
       </div>
-      <label className="inline-flex flex-1 cursor-pointer items-center justify-end">
+      <label
+        aria-label={`${label} 토글`}
+        className="inline-flex flex-1 cursor-pointer items-center justify-end"
+      >
         <input
           type="checkbox"
-          value={`${label} toggle`}
+          value={`${label} 토글`}
           className="peer sr-only"
           checked={isChecked}
           onChange={e => {
@@ -55,25 +58,51 @@ type NumberOptionProps = {
   label: string
   description?: string
 }
+const BITS_PER_MEGABIT = 1_000_000
+const MIN_BITRATE_MBPS = 0.001
+const MAX_BITRATE_MBPS = 25
+const BITRATE_STEP_MBPS = 0.1
+
 function NumberOption({ label, description }: NumberOptionProps) {
   const { options, updateOption } = useOptions()
   const [draftValue, setDraftValue] = useState<string | null>(null)
 
-  const inputValue = draftValue ?? String(options.videoBitsPerSecond)
-  const commitValue = async (): Promise<void> => {
-    const parsedValue = Number(inputValue)
+  const inputValue = draftValue ?? String(options.videoBitsPerSecond / BITS_PER_MEGABIT)
+  const commitValue = async (value = inputValue): Promise<void> => {
+    const parsedValue = Number(value)
 
-    if (!Number.isFinite(parsedValue) || parsedValue < 1000 || parsedValue > 25000000) {
+    if (
+      !Number.isFinite(parsedValue) ||
+      parsedValue < MIN_BITRATE_MBPS ||
+      parsedValue > MAX_BITRATE_MBPS
+    ) {
       setDraftValue(null)
       return
     }
 
-    const normalizedValue = Math.round(parsedValue)
+    const normalizedValue = Math.round(parsedValue * BITS_PER_MEGABIT)
     setDraftValue(null)
 
     if (normalizedValue !== options.videoBitsPerSecond) {
       await updateOption('videoBitsPerSecond', normalizedValue)
     }
+  }
+
+  const adjustValue = (direction: 1 | -1) => {
+    const parsedValue = Number(inputValue)
+    const currentValue =
+      inputValue.trim() !== '' && Number.isFinite(parsedValue)
+        ? parsedValue
+        : options.videoBitsPerSecond / BITS_PER_MEGABIT
+    const nextValue = Math.min(
+      MAX_BITRATE_MBPS,
+      Math.max(
+        MIN_BITRATE_MBPS,
+        Math.round((currentValue + direction * BITRATE_STEP_MBPS) * BITS_PER_MEGABIT) /
+          BITS_PER_MEGABIT
+      )
+    )
+    void commitValue(String(nextValue))
   }
 
   return (
@@ -86,46 +115,88 @@ function NumberOption({ label, description }: NumberOptionProps) {
           </p>
         )}
       </div>
-      <input
-        type="number"
-        min={1000}
-        max={25000000}
-        inputMode="numeric"
-        className={cn(
-          'number-input w-20 self-center rounded-xl border border-white/10 bg-white/5 py-1',
-          'text-center text-[0.8rem] leading-[var(--text-sm--line-height)] text-white',
-          'transition-colors outline-none focus:border-chzzk-green'
-        )}
-        value={inputValue}
-        onChange={e => {
-          setDraftValue(e.target.value)
-        }}
-        onBlur={() => {
-          void commitValue()
-        }}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            e.currentTarget.blur()
+      <div
+        className="flex shrink-0 items-center gap-1 self-center rounded-lg border border-white/10 bg-white/5 pr-1 pl-1 transition-colors focus-within:border-chzzk-green"
+        onBlur={e => {
+          if (!e.currentTarget.contains(e.relatedTarget)) {
+            void commitValue()
           }
         }}
-      />
+      >
+        <input
+          type="number"
+          min={MIN_BITRATE_MBPS}
+          max={MAX_BITRATE_MBPS}
+          step="any"
+          inputMode="decimal"
+          aria-label={`${label} (Mbps)`}
+          className={cn(
+            'number-input w-9 min-w-0 bg-transparent py-1',
+            'text-center text-[0.8rem] leading-[var(--text-sm--line-height)] text-white',
+            'outline-none'
+          )}
+          value={inputValue}
+          onChange={e => {
+            setDraftValue(e.target.value)
+          }}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.currentTarget.blur()
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+              e.preventDefault()
+              adjustValue(e.key === 'ArrowUp' ? 1 : -1)
+            }
+          }}
+        />
+        <span aria-hidden="true" className="pointer-events-none text-[0.65rem] text-zinc-400">
+          Mbps
+        </span>
+        <div className="flex flex-col">
+          {([1, -1] as const).map(direction => (
+            <button
+              key={direction}
+              type="button"
+              aria-label={`비트레이트 ${BITRATE_STEP_MBPS} Mbps ${direction === 1 ? '증가' : '감소'}`}
+              disabled={
+                direction === 1
+                  ? Number(inputValue) >= MAX_BITRATE_MBPS
+                  : Number(inputValue) <= MIN_BITRATE_MBPS
+              }
+              className="flex h-4 w-5 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-white/10 hover:text-white focus-visible:text-white focus-visible:outline focus-visible:outline-chzzk-green disabled:opacity-30"
+              onClick={() => adjustValue(direction)}
+            >
+              <svg
+                aria-hidden="true"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d={direction === 1 ? 'M3 7.5 6 4.5 9 7.5' : 'M3 4.5 6 7.5 9 4.5'} />
+              </svg>
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
 
 function Header() {
   return (
-    <header>
-      <div className="my-5 flex w-full items-center gap-4 rounded-2xl border border-white/10 bg-white/5 px-5 py-4">
-        <img
-          src={browser.runtime.getURL('/icons/128.png')}
-          alt="Cheese-PIP extension logo"
-          className="h-12 w-12 shrink-0 object-contain"
-        />
-        <div className="min-w-0">
-          <h1 className="text-lg font-bold tracking-tight text-white">Cheese-PIP</h1>
-          <span className="text-xs text-zinc-500">v{__APP_VERSION__} </span>
-        </div>
+    <header className="flex items-center gap-3 pt-6 pb-3">
+      <img
+        src={browser.runtime.getURL('/icons/128.png')}
+        alt="Cheese-PIP extension logo"
+        className="h-12 w-12 shrink-0 object-contain"
+      />
+      <div className="min-w-0">
+        <h1 className="text-lg font-bold tracking-tight text-white">Cheese PIP</h1>
+        <span className="text-xs text-zinc-500">v{__APP_VERSION__}</span>
       </div>
     </header>
   )
@@ -135,7 +206,7 @@ function Main() {
   const { keyBindings } = useOptions()
 
   return (
-    <main className="w-full flex-row items-center text-zinc-50">
+    <main className="w-full flex-row items-center tracking-tight text-zinc-50">
       <div className="mt-3 grid gap-6 rounded-2xl border border-white/10 px-4 py-4">
         <Option
           optionKey="rec"
@@ -212,9 +283,7 @@ function Main() {
 
           <NumberOption
             label="녹화 비트레이트"
-            description={
-              '녹화 비트레이트를 설정합니다.\n단위는 bps(초당 비트)입니다.\n(범위: 1000 ~ 25000000)'
-            }
+            description={'녹화 비트레이트를 설정합니다.(0.001 ~ 25 Mbps)'}
           />
         </div>
       </details>
