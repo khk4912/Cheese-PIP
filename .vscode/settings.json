@@ -7,6 +7,5 @@
     "source.fixAll.oxc": "explicit",
     "source.fixAll.ts": "explicit"
   },
-  "cSpell.words": ["chzzk", "Pretendard"],
-  "workbench.colorTheme": "Dark Modern"
+  "cSpell.words": ["chzzk", "Pretendard"]
 }
