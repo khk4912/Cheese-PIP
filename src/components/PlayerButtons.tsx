@@ -1,3 +1,4 @@
+import { useOptions } from '@/hooks/useOptions'
 import { usePortal } from '@/hooks/element'
 import ReactDOM from 'react-dom'
 import { RecordButton } from './record/RecordButton'
@@ -13,6 +14,11 @@ function PlayerButtonsContainer({ children }: { children: React.ReactNode }) {
 }
 
 export function PlayerButtonsRenderer() {
+  const { options, isReady } = useOptions()
+  if (!isReady || !options.rec) {
+    return null
+  }
+
   return (
     <PlayerButtonsContainer>
       <RecordButton />

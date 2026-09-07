@@ -33,6 +33,7 @@ interface UsePortalProps {
   style?: React.CSSProperties
 }
 
+// 확장 프로그램 렌더를 위해 사용하는 Portal Hook
 export function usePortal({ targetSelector, id, position = 'after', style }: UsePortalProps) {
   const [div] = useState(() => {
     const d = document.createElement('div')
@@ -46,6 +47,7 @@ export function usePortal({ targetSelector, id, position = 'after', style }: Use
     return d
   })
 
+  const [isAttached, setIsAttached] = useState(false)
   const tgNode = useElementTarget(targetSelector ?? 'body')
 
   useEffect(() => {
@@ -67,10 +69,15 @@ export function usePortal({ targetSelector, id, position = 'after', style }: Use
       tgNode.appendChild(div)
     }
 
+    // DOM 부착 결과를 반영한 다음 포털의 자식과 단축키를 활성화합니다.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setIsAttached(div.isConnected)
+
     return () => {
+      setIsAttached(false)
       div.remove()
     }
   }, [tgNode, div, position])
 
-  return div
+  return isAttached ? div : null
 }
