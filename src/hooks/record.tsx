@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useOptions } from './useOptions'
 
 type RecordingStatus = 'recording' | 'stopped'
-export function useRecord () {
+export function useRecord() {
   const [status, setStatus] = useState<RecordingStatus>('stopped')
 
   const recorderRef = useRef<MediaRecorder | null>(null)
@@ -39,6 +39,6 @@ export function useRecord () {
     highFrameRateRec,
     videoRef,
     recorderRef,
-    toggle
+    toggle,
   }
 }

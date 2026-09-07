@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export function useElementTarget (selector: string) {
+export function useElementTarget(selector: string) {
   const [target, setTarget] = useState<Element | undefined>(undefined)
   useEffect(() => {
     if (target !== undefined) {
@@ -33,11 +33,15 @@ interface UsePortalProps {
   style?: React.CSSProperties
 }
 
-export function usePortal ({ targetSelector, id, position = 'after', style }: UsePortalProps) {
+export function usePortal({ targetSelector, id, position = 'after', style }: UsePortalProps) {
   const [div] = useState(() => {
     const d = document.createElement('div')
-    if (id) { d.id = id }
-    if (style) { Object.assign(d.style, style) }
+    if (id) {
+      d.id = id
+    }
+    if (style) {
+      Object.assign(d.style, style)
+    }
 
     return d
   })
@@ -53,7 +57,7 @@ export function usePortal ({ targetSelector, id, position = 'after', style }: Us
       before: 'beforebegin',
       prepend: 'afterbegin',
       append: 'beforeend',
-      after: 'afterend'
+      after: 'afterend',
     }
 
     const insertPosition = positionMap[position]

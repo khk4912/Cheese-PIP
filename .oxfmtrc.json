@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "semi": false,
+  "printWidth": 100,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "arrowParens": "avoid",
+  "ignorePatterns": [
+    ".wxt/**",
+    ".output/**",
+    "dist/**",
+    "dist-firefox/**",
+    "build/**",
+    "node_modules/**"
+  ],
+  "sortTailwindcss": {
+    "functions": ["cn"],
+    "stylesheet": "./src/assets/tailwind.css"
+  }
+}

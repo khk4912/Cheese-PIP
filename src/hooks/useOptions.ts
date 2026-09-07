@@ -1,7 +1,7 @@
 import { use } from 'react'
 import { OptionContext } from '@/providers/OptionContext'
 
-export function useOptions () {
+export function useOptions() {
   const context = use(OptionContext)
 
   if (context == null) {

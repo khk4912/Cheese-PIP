@@ -26,7 +26,7 @@ export const koreanToEnglish = {
   ㅡ: 'M',
   ㅣ: 'L',
   ㅐ: 'O',
-  ㅔ: 'P'
+  ㅔ: 'P',
 } as const
 
 /**
@@ -35,16 +35,18 @@ export const koreanToEnglish = {
  * @param key 감지할 키 / 키들의 배열
  * @param callback 키 입력 시 실행할 콜백 함수
  */
-export function useShortcut (key: string | string[], callback: () => void): void {
+export function useShortcut(key: string | string[], callback: () => void): void {
   useEffect(() => {
     const listener = (event: KeyboardEvent): void => {
       const activeElement = document.activeElement
       let eventKey = event.key
 
       // 입력 요소가 검색창, 채팅창 등의 입력 요소일 경우 무시
-      if (activeElement instanceof HTMLInputElement ||
+      if (
+        activeElement instanceof HTMLInputElement ||
         activeElement instanceof HTMLTextAreaElement ||
-         activeElement instanceof HTMLPreElement) {
+        activeElement instanceof HTMLPreElement
+      ) {
         return
       }
 
@@ -57,7 +59,9 @@ export function useShortcut (key: string | string[], callback: () => void): void
         eventKey = koreanToEnglish[eventKey as keyof typeof koreanToEnglish]
       }
 
-      if (typeof key === 'string' && (eventKey.toUpperCase() === key.toUpperCase())) { callback() }
+      if (typeof key === 'string' && eventKey.toUpperCase() === key.toUpperCase()) {
+        callback()
+      }
 
       if (Array.isArray(key) && key.includes(eventKey)) {
         callback()

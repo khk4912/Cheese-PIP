@@ -2,7 +2,7 @@ import { inject } from '@/utils/inject'
 import { OptionProvider } from '@/providers/OptionProvider'
 import { PlayerButtonsRenderer } from '@/components/PlayerButtons'
 
-export function RenderUI () {
+export function RenderUI() {
   let div = document.createElement('div')
   div.id = 'cheese-pip-ui-root'
 
@@ -10,10 +10,11 @@ export function RenderUI () {
     <OptionProvider>
       <PlayerButtonsRenderer />
     </OptionProvider>,
-    div)
+    div
+  )
 
   document.body.appendChild(div)
-  window.navigation?.addEventListener('navigate', (event) => {
+  window.navigation?.addEventListener('navigate', event => {
     if (event.downloadRequest !== null) {
       return
     }

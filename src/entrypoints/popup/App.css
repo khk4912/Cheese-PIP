@@ -1,8 +1,8 @@
-.advanced-options>summary {
+.advanced-options > summary {
   list-style: none;
 }
 
-.advanced-options>summary::-webkit-details-marker {
+.advanced-options > summary::-webkit-details-marker {
   display: none;
 }
 

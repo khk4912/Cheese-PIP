@@ -1,10 +1,5 @@
 import { storage } from '#imports'
-import {
-  useEffect,
-  useRef,
-  useState,
-  type PropsWithChildren,
-} from 'react'
+import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
 import {
   DEFAULT_KEYBINDINGS,
   getOptions,
@@ -21,7 +16,7 @@ import {
 } from '@/utils/options'
 import { OptionContext, type OptionContextValue } from './OptionContext'
 
-export function OptionProvider ({ children }: PropsWithChildren) {
+export function OptionProvider({ children }: PropsWithChildren) {
   const [options, setOptionState] = useState<CheesePIPOptions>(DEFAULT_OPTIONS)
   const [keyBindings, setKeyBindingsState] = useState<Required<KeyBindings>>(DEFAULT_KEYBINDINGS)
 
@@ -40,7 +35,7 @@ export function OptionProvider ({ children }: PropsWithChildren) {
 
   useEffect(() => {
     let isMounted = true
-    const unwatch = storage.watch<Partial<CheesePIPOptions>>(OPTIONS_STORAGE_KEY, (newValue) => {
+    const unwatch = storage.watch<Partial<CheesePIPOptions>>(OPTIONS_STORAGE_KEY, newValue => {
       if (!isMounted) {
         return
       }
@@ -49,7 +44,7 @@ export function OptionProvider ({ children }: PropsWithChildren) {
       setIsOptionsLoading(false)
     })
 
-    void getOptions().then((loadedOptions) => {
+    void getOptions().then(loadedOptions => {
       if (!isMounted) {
         return
       }
@@ -66,7 +61,7 @@ export function OptionProvider ({ children }: PropsWithChildren) {
 
   useEffect(() => {
     let isMounted = true
-    const unwatch = storage.watch<Partial<KeyBindings>>(KEYBINDINGS_STORAGE_KEY, (newValue) => {
+    const unwatch = storage.watch<Partial<KeyBindings>>(KEYBINDINGS_STORAGE_KEY, newValue => {
       if (!isMounted) {
         return
       }
@@ -75,7 +70,7 @@ export function OptionProvider ({ children }: PropsWithChildren) {
       setIsKeyBindingsLoading(false)
     })
 
-    void getKeyBindings().then((loadedKeyBindings) => {
+    void getKeyBindings().then(loadedKeyBindings => {
       if (!isMounted) {
         return
       }
