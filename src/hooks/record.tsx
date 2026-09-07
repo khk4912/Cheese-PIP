@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useOptions } from './useOptions'
 
 type RecordingStatus = 'recording' | 'stopped'
@@ -13,24 +13,18 @@ export function useRecord() {
 
   // Unmounting Cleanup
   useEffect(() => {
-    const recorder = recorderRef.current
     return () => {
-      recorder?.stop()
+      const recorder = recorderRef.current
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.stop()
+      }
+      recorderRef.current = null
     }
   }, [])
 
-  // Video onended handler
-  useEffect(() => {
-    // TODO: Video onended 발생 시 녹화 종료
-    const video = videoRef.current
-  }, [])
-
+  // TODO: 실제 녹화 연결 시 video ended 이벤트에서 녹화를 종료합니다.
   const toggle = () => {
-    if (status === 'recording') {
-      setStatus('stopped')
-    } else {
-      setStatus('recording')
-    }
+    setStatus(current => (current === 'recording' ? 'stopped' : 'recording'))
   }
 
   return {

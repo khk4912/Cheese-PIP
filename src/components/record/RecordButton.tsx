@@ -1,4 +1,4 @@
-import { use, useState } from 'react'
+import { useOptions } from '@/hooks/useOptions'
 
 import { CheeseButtonBase } from '../CheeseButtonBase'
 import { useShortcut } from '@/hooks/keyBinding'
@@ -14,19 +14,13 @@ export function RecordButton() {
   const { toggle, status } = useRecord()
   const isRecording = status === 'recording'
 
-  useShortcut(recKey, () => {
-    toggle()
-  })
-
-  const handleClick = () => {
-    toggle()
-  }
+  useShortcut(recKey, toggle)
 
   return (
     <CheeseButtonBase
       title={`녹화 ${isRecording ? '중지' : ''} (${recKey})`}
       className="cheese-pip-record-button"
-      onClick={handleClick}
+      onClick={toggle}
       iconSVG={<RecordIcon fill={isRecording ? RecordingColor : 'currentColor'} />}
     />
   )
