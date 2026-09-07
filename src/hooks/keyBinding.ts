@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export const koreanToEnglish = {
+const koreanToEnglish = {
   ㄱ: 'R',
   ㄴ: 'S',
   ㄷ: 'E',
@@ -39,10 +39,17 @@ export function useShortcut(key: string | string[], callback: () => void): void 
   useEffect(() => {
     const listener = (event: KeyboardEvent): void => {
       const activeElement = document.activeElement
-      let eventKey = event.key
+      const eventKey = (
+        koreanToEnglish[event.key as keyof typeof koreanToEnglish] ?? event.key
+      ).toUpperCase()
 
       // 입력 요소가 검색창, 채팅창 등의 입력 요소일 경우 무시
       if (
+        event.defaultPrevented ||
+        event.repeat ||
+        event.isComposing ||
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable) ||
+        (event.target instanceof HTMLElement && event.target.isContentEditable) ||
         activeElement instanceof HTMLInputElement ||
         activeElement instanceof HTMLTextAreaElement ||
         activeElement instanceof HTMLPreElement
@@ -55,15 +62,9 @@ export function useShortcut(key: string | string[], callback: () => void): void 
         return
       }
 
-      if (/[ㄱ-ㅎ|ㅏ-ㅣ]/.test(eventKey)) {
-        eventKey = koreanToEnglish[eventKey as keyof typeof koreanToEnglish]
-      }
-
-      if (typeof key === 'string' && eventKey.toUpperCase() === key.toUpperCase()) {
-        callback()
-      }
-
-      if (Array.isArray(key) && key.includes(eventKey)) {
+      // 대소문자 구분 없이 key를 비교하여 callback 실행
+      const keys = typeof key === 'string' ? [key] : key
+      if (keys.some(candidate => candidate.toUpperCase() === eventKey)) {
         callback()
       }
     }
