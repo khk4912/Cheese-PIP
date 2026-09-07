@@ -25,7 +25,14 @@ export function useElementTarget(selector: string) {
   return target
 }
 
+/*
+before: target의 이전 형제 요소로 삽입
+prepend: target의 첫 번째 자식 요소로 삽입
+append: target의 마지막 자식 요소로 삽입
+after: target의 다음 형제 요소로 삽입
+*/
 type InsertPositions = 'before' | 'prepend' | 'append' | 'after'
+
 interface UsePortalProps {
   id?: string
   targetSelector?: string

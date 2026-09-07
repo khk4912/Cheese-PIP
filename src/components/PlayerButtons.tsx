@@ -15,13 +15,10 @@ function PlayerButtonsContainer({ children }: { children: React.ReactNode }) {
 
 export function PlayerButtonsRenderer() {
   const { options, isReady } = useOptions()
-  if (!isReady || !options.rec) {
+
+  if (!isReady) {
     return null
   }
 
-  return (
-    <PlayerButtonsContainer>
-      <RecordButton />
-    </PlayerButtonsContainer>
-  )
+  return <PlayerButtonsContainer>{options.rec && <RecordButton />}</PlayerButtonsContainer>
 }
