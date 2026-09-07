@@ -21,8 +21,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "clsx": "^2.1.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ import './App.css'
 import '@/assets/tailwind.css'
 
 import { useState } from 'react'
+import { cn } from '@/utils/cn'
 import type { CheesePIPOptions } from '@/utils/options'
 import { useOptions } from '@/hooks/useOptions'
 
@@ -36,7 +37,15 @@ function Option({ optionKey, label, description }: ToggleProps) {
             void updateOption(optionKey, e.target.checked)
           }}
         />
-        <div className="peer peer-checked:after:border-buffer relative h-5 w-9 rounded-full bg-gray-500 peer-checked:bg-chzzk-green peer-focus:ring-1 peer-focus:ring-blue-300 peer-focus:outline-none after:absolute after:inset-s-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full" />
+        <div
+          className={cn(
+            'peer relative h-5 w-9 rounded-full bg-gray-500',
+            'peer-checked:bg-chzzk-green',
+            'peer-focus:ring-1 peer-focus:ring-blue-300 peer-focus:outline-none',
+            "after:absolute after:inset-s-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-['']",
+            'peer-checked:after:border-buffer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full'
+          )}
+        />
       </label>
     </div>
   )
@@ -82,7 +91,11 @@ function NumberOption({ label, description }: NumberOptionProps) {
         min={1000}
         max={25000000}
         inputMode="numeric"
-        className="number-input w-20 self-center rounded-xl border border-white/10 bg-white/5 py-1 text-center text-sm text-[0.8rem] text-white transition-colors outline-none focus:border-chzzk-green"
+        className={cn(
+          'number-input w-20 self-center rounded-xl border border-white/10 bg-white/5 py-1',
+          'text-center text-[0.8rem] leading-[var(--text-sm--line-height)] text-white',
+          'transition-colors outline-none focus:border-chzzk-green'
+        )}
         value={inputValue}
         onChange={e => {
           setDraftValue(e.target.value)

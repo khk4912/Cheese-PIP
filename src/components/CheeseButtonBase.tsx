@@ -1,3 +1,5 @@
+import { cn } from '@/utils/cn'
+
 type CheeseButtonBaseProps = {
   title: string
   iconSVG: React.ReactNode
@@ -7,7 +9,7 @@ type CheeseButtonBaseProps = {
 export function CheeseButtonBase({ title, iconSVG, className, onClick }: CheeseButtonBaseProps) {
   return (
     <button
-      className={`pzp-pc__setting-button pzp-button pzp-pc-ui-button ${className || ''}`}
+      className={cn('pzp-pc__setting-button pzp-button pzp-pc-ui-button', className)}
       onClick={onClick}
     >
       <span className="pzp-button__tooltip pzp-button__tooltip--top">{title}</span>
