@@ -81,11 +81,15 @@ function FavoritesList (): React.ReactElement | null {
         isExpanded ? styles.expanded : styles.collapsed
       ].join(' ')}
     >
-      <div className={styles.header}>
-        <strong className={styles.title}>
-          {isExpanded ? '스트리머 즐겨찾기' : '즐겨찾기'}
-        </strong>
-      </div>
+      {isExpanded && (
+        <div className={styles.header}>
+          {isExpanded
+            ? <strong className={styles.title}>
+              스트리머 즐겨찾기
+              </strong>
+            : null}
+        </div>
+      )}
       <ul className={styles.list}>
         {favoriteChannels.map(channel => (
           <ChannelItem
