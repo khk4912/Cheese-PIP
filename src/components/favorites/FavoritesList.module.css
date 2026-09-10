@@ -5,6 +5,7 @@
   padding: 0;
   border: 0;
   color: inherit;
+  color-scheme: inherit;
   font-family: inherit;
 }
 
@@ -16,20 +17,21 @@
   padding-inline: 0;
 }
 
-.expanded::before,
+.collapsed::before,
 .root::after {
   display: block;
   height: 1px;
   margin: 5px auto 10px;
-  background-color: rgb(68 68 68);
+  background-color: light-dark(rgb(218 218 218), rgb(68 68 68));
   content: '';
 }
 
-.expanded::before,
+
 .expanded::after {
   width: calc(100% - 10px);
 }
 
+.collapsed::before,
 .collapsed::after {
   width: 32px;
 }
@@ -54,8 +56,7 @@
   gap: 4px;
   overflow: hidden;
   margin: 0;
-  color: rgb(157 165 182);
-  color-scheme: dark;
+  color: light-dark(rgb(80 80 80), rgb(157 165 182));
   font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic NEO", "Helvetica Neue", Helvetica, 나눔고딕, NanumGothic, "Malgun Gothic", "맑은 고딕", 굴림, gulim, 새굴림, "noto sans", 돋움, Dotum, sans-serif;
   font-size: 13px;
   font-weight: 600;
@@ -72,9 +73,40 @@
   text-align: left;
 }
 
+.refreshButton {
+  box-sizing: border-box;
+  display: flex;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: light-dark(rgb(112 112 112), rgb(105 113 131));
+  cursor: pointer;
+}
+
+.refreshButton:hover:not(:disabled) {
+  background-color: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 6%));
+  color: light-dark(rgb(34 34 34), rgb(255 255 255));
+}
+
+.refreshButton:focus-visible {
+  outline: 2px solid rgb(0 255 163);
+  outline-offset: 2px;
+}
+
+.refreshButton:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 .collapsed .title {
   width: 100%;
-  color: rgb(147 155 172);
+  color: light-dark(rgb(80 80 80), rgb(147 155 172));
   font-size: 11px;
   letter-spacing: -0.5px;
   text-align: center;
@@ -105,12 +137,12 @@
   gap: 10px;
   padding: 5px;
   border-radius: 8px;
-  color: rgb(201 206 220);
+  color: light-dark(rgb(34 34 34), rgb(201 206 220));
   text-decoration: none;
 }
 
 .itemLink:hover {
-  background-color: rgb(255 255 255 / 6%);
+  background-color: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 5%));
 }
 
 .itemLink:focus-visible {
@@ -137,20 +169,20 @@
 
 .profile.live {
   background:
-    linear-gradient(rgb(20 21 23), rgb(20 21 23)) content-box,
+    linear-gradient(light-dark(rgb(255 255 255), rgb(20 21 23)), light-dark(rgb(255 255 255), rgb(20 21 23))) content-box,
     linear-gradient(rgb(0 255 163) 0%, rgb(2 127 128) 100%) border-box;
 }
 
 .profile:not(.live) {
   background:
-    linear-gradient(rgb(20 21 23), rgb(20 21 23)) content-box,
-    linear-gradient(rgb(77 77 77), rgb(77 77 77)) border-box;
+    linear-gradient(light-dark(rgb(255 255 255), rgb(20 21 23)), light-dark(rgb(255 255 255), rgb(20 21 23))) content-box,
+    linear-gradient(light-dark(rgb(190 190 190), rgb(77 77 77)), light-dark(rgb(190 190 190), rgb(77 77 77))) border-box;
 }
 
 .profile::after {
   position: absolute;
   inset: 3px;
-  border: 1px solid rgb(255 255 255 / 5%);
+  border: 1px solid light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 5%));
   border-radius: 50%;
   content: '';
   pointer-events: none;
@@ -162,7 +194,7 @@
   height: 26px;
   margin: 2px;
   border-radius: 50%;
-  background-color: rgb(46 48 51);
+  background-color: light-dark(rgb(239 240 243), rgb(46 48 51));
   object-fit: cover;
 }
 
@@ -175,7 +207,7 @@
   min-width: 0;
   overflow: hidden;
   margin: 0;
-  color: rgb(201 206 220);
+  color: light-dark(rgb(34 34 34), rgb(201 206 220));
   font-size: 13px;
   font-weight: 700;
   line-height: 17px;
