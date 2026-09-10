@@ -16,6 +16,7 @@
   padding-inline: 0;
 }
 
+.expanded::before,
 .root::after {
   display: block;
   height: 1px;
@@ -24,6 +25,7 @@
   content: '';
 }
 
+.expanded::before,
 .expanded::after {
   width: calc(100% - 10px);
 }
@@ -35,20 +37,33 @@
 .header {
   box-sizing: border-box;
   display: flex;
-  height: 26px;
+  height: 32px;
   align-items: center;
   margin: 0;
   padding: 5px;
 }
 
 .title {
-  display: block;
+  box-sizing: border-box;
+  display: flex;
+  height: 22px;
+  min-height: 22px;
+  min-width: 0;
+  flex: 1 1 0%;
+  align-items: center;
+  gap: 4px;
   overflow: hidden;
   margin: 0;
-  color: rgb(105 113 131);
+  color: rgb(157 165 182);
+  color-scheme: dark;
+  font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic NEO", "Helvetica Neue", Helvetica, 나눔고딕, NanumGothic, "Malgun Gothic", "맑은 고딕", 굴림, gulim, 새굴림, "noto sans", 돋움, Dotum, sans-serif;
   font-size: 13px;
-  font-weight: 700;
-  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  line-height: 17px;
+  text-align: left;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   text-overflow: clip;
   white-space: nowrap;
 }

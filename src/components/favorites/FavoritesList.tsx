@@ -21,6 +21,7 @@ const isSidebarExpanded = (sidebar: Element): boolean =>
 
 function FavoritesList (): React.ReactElement | null {
   const [isExpanded, setIsExpanded] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [favoriteChannels, setFavoriteChannels] = useState<FavoriteChannel[]>([])
 
   const fetchFavorites = async () => {
@@ -28,6 +29,17 @@ function FavoritesList (): React.ReactElement | null {
       setFavoriteChannels(await getFavoriteChannels())
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const refreshFavorites = async () => {
+    if (isRefreshing) return
+
+    setIsRefreshing(true)
+    try {
+      await fetchFavorites()
+    } finally {
+      setIsRefreshing(false)
     }
   }
 
@@ -83,11 +95,27 @@ function FavoritesList (): React.ReactElement | null {
     >
       {isExpanded && (
         <div className={styles.header}>
-          {isExpanded
-            ? <strong className={styles.title}>
-              스트리머 즐겨찾기
-              </strong>
-            : null}
+          <strong className={styles.title}>스트리머 즐겨찾기</strong>
+          <button
+            aria-label='즐겨찾기 새로고침'
+            aria-busy={isRefreshing}
+            className={styles.refreshButton}
+            disabled={isRefreshing}
+            onClick={() => { refreshFavorites().catch(console.error) }}
+            title='새로고침'
+            type='button'
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              width={14}
+              height={14}
+              viewBox='0 0 14 14'
+              fill='none'
+              aria-hidden='true'
+            >
+              <path fill='currentColor' d='M12.212 1.749a.758.758 0 1 0-1.517 0v.922a5.829 5.829 0 1 0 2.133 4.507.758.758 0 0 0-1.516 0 4.312 4.312 0 1 1-1.689-3.422h-.935a.758.758 0 1 0 0 1.516h2.766c.418 0 .758-.34.758-.758V1.75Z' />
+            </svg>
+          </button>
         </div>
       )}
       <ul className={styles.list}>
