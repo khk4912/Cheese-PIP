@@ -51,6 +51,10 @@ export default defineConfig({
         }
       },
       plugins: [svgr()],
+      build: {
+        // Extension pages load shared chunks through normal module imports.
+        modulePreload: false,
+      },
       css: {
         modules: {
           localsConvention: 'camelCase',

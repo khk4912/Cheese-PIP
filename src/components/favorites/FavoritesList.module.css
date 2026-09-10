@@ -1,12 +1,36 @@
 .root {
+  --favorites-divider: rgb(226 226 229);
+  --favorites-title: rgb(80 80 80);
+  --favorites-muted: rgb(112 112 112);
+  --favorites-button-hover: rgb(0 0 0 / 6%);
+  --favorites-button-hover-text: rgb(34 34 34);
+  --favorites-collapsed-title: rgb(80 80 80);
+  --favorites-text: rgb(34 34 34);
+  --favorites-hover: rgb(0 0 0 / 5%);
+  --favorites-surface: rgb(255 255 255);
+  --favorites-offline-ring: rgb(190 190 190);
+  --favorites-profile-surface: rgb(239 240 243);
   box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 0;
   border: 0;
   color: inherit;
-  color-scheme: inherit;
   font-family: inherit;
+}
+
+:global(html.theme_dark) .root {
+  --favorites-divider: rgb(34 35 38);
+  --favorites-title: rgb(157 165 182);
+  --favorites-muted: rgb(105 113 131);
+  --favorites-button-hover: rgb(255 255 255 / 6%);
+  --favorites-button-hover-text: rgb(255 255 255);
+  --favorites-collapsed-title: rgb(147 155 172);
+  --favorites-text: rgb(201 206 220);
+  --favorites-hover: rgb(255 255 255 / 5%);
+  --favorites-surface: rgb(20 21 23);
+  --favorites-offline-ring: rgb(77 77 77);
+  --favorites-profile-surface: rgb(46 48 51);
 }
 
 .expanded {
@@ -22,7 +46,7 @@
   display: block;
   height: 1px;
   margin: 5px auto 10px;
-  background-color: light-dark(rgb(226 226 229), rgb(34 35 38));
+  background-color: var(--favorites-divider);
   content: '';
 }
 
@@ -56,7 +80,7 @@
   gap: 4px;
   overflow: hidden;
   margin: 0;
-  color: light-dark(rgb(80 80 80), rgb(157 165 182));
+  color: var(--favorites-title);
   font-family: "Pretendard Variable", Pretendard, "Apple SD Gothic NEO", "Helvetica Neue", Helvetica, 나눔고딕, NanumGothic, "Malgun Gothic", "맑은 고딕", 굴림, gulim, 새굴림, "noto sans", 돋움, Dotum, sans-serif;
   font-size: 13px;
   font-weight: 600;
@@ -85,13 +109,13 @@
   border: 0;
   border-radius: 4px;
   background: transparent;
-  color: light-dark(rgb(112 112 112), rgb(105 113 131));
+  color: var(--favorites-muted);
   cursor: pointer;
 }
 
 .refreshButton:hover:not(:disabled) {
-  background-color: light-dark(rgb(0 0 0 / 6%), rgb(255 255 255 / 6%));
-  color: light-dark(rgb(34 34 34), rgb(255 255 255));
+  background-color: var(--favorites-button-hover);
+  color: var(--favorites-button-hover-text);
 }
 
 .refreshButton:focus-visible {
@@ -106,7 +130,7 @@
 
 .collapsed .title {
   width: 100%;
-  color: light-dark(rgb(80 80 80), rgb(147 155 172));
+  color: var(--favorites-collapsed-title);
   font-size: 11px;
   letter-spacing: -0.5px;
   text-align: center;
@@ -137,12 +161,12 @@
   gap: 10px;
   padding: 5px;
   border-radius: 8px;
-  color: light-dark(rgb(34 34 34), rgb(201 206 220));
+  color: var(--favorites-text);
   text-decoration: none;
 }
 
 .itemLink:hover {
-  background-color: light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 5%));
+  background-color: var(--favorites-hover);
 }
 
 .itemLink:focus-visible {
@@ -169,20 +193,20 @@
 
 .profile.live {
   background:
-    linear-gradient(light-dark(rgb(255 255 255), rgb(20 21 23)), light-dark(rgb(255 255 255), rgb(20 21 23))) content-box,
+    linear-gradient(var(--favorites-surface), var(--favorites-surface)) content-box,
     linear-gradient(rgb(0 255 163) 0%, rgb(2 127 128) 100%) border-box;
 }
 
 .profile:not(.live) {
   background:
-    linear-gradient(light-dark(rgb(255 255 255), rgb(20 21 23)), light-dark(rgb(255 255 255), rgb(20 21 23))) content-box,
-    linear-gradient(light-dark(rgb(190 190 190), rgb(77 77 77)), light-dark(rgb(190 190 190), rgb(77 77 77))) border-box;
+    linear-gradient(var(--favorites-surface), var(--favorites-surface)) content-box,
+    linear-gradient(var(--favorites-offline-ring), var(--favorites-offline-ring)) border-box;
 }
 
 .profile::after {
   position: absolute;
   inset: 3px;
-  border: 1px solid light-dark(rgb(0 0 0 / 5%), rgb(255 255 255 / 5%));
+  border: 1px solid var(--favorites-hover);
   border-radius: 50%;
   content: '';
   pointer-events: none;
@@ -194,7 +218,7 @@
   height: 26px;
   margin: 2px;
   border-radius: 50%;
-  background-color: light-dark(rgb(239 240 243), rgb(46 48 51));
+  background-color: var(--favorites-profile-surface);
   object-fit: cover;
 }
 
@@ -207,7 +231,7 @@
   min-width: 0;
   overflow: hidden;
   margin: 0;
-  color: light-dark(rgb(34 34 34), rgb(201 206 220));
+  color: var(--favorites-text);
   font-size: 13px;
   font-weight: 700;
   line-height: 17px;
