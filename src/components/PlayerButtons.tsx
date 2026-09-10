@@ -2,6 +2,8 @@ import { useOptions } from '@/hooks/useOptions'
 import { usePortal } from '@/hooks/element'
 import ReactDOM from 'react-dom'
 import { RecordButton } from './record/RecordButton'
+import { ScreenshotButton } from './screenshot/ScreenshotButton'
+import { PipButton } from './pip/PipButton'
 
 function PlayerButtonsContainer({ children }: { children: React.ReactNode }) {
   const portal = usePortal({
@@ -20,5 +22,11 @@ export function PlayerButtonsRenderer() {
     return null
   }
 
-  return <PlayerButtonsContainer>{options.rec && <RecordButton />}</PlayerButtonsContainer>
+  return (
+    <PlayerButtonsContainer>
+      {options.rec && <RecordButton />}
+      {options.screenshot && <ScreenshotButton />}
+      {options.pip && <PipButton />}
+    </PlayerButtonsContainer>
+  )
 }
