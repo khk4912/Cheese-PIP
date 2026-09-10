@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { cn } from '@/utils/cn'
 import type { CheesePIPOptions } from '@/utils/options'
 import { useOptions } from '@/hooks/useOptions'
+import { ShortcutSetting } from './ShortcutDialog'
 
 type BooleanOptionKey = Exclude<keyof CheesePIPOptions, 'videoBitsPerSecond'>
 type ToggleProps = {
@@ -295,6 +296,7 @@ function Footer() {
   return (
     <footer className="mx-3 mt-3 pb-5 text-xs text-zinc-400">
       <div className="mx-auto mb-3 flex items-center justify-center gap-3">
+        <ShortcutSetting />
         <button
           className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 transition-colors hover:cursor-pointer hover:bg-white/10"
           onClick={() => {
