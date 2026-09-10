@@ -17,16 +17,16 @@
   padding-inline: 0;
 }
 
-.collapsed::before,
+.root::before,
 .root::after {
   display: block;
   height: 1px;
   margin: 5px auto 10px;
-  background-color: light-dark(rgb(218 218 218), rgb(68 68 68));
+  background-color: light-dark(rgb(226 226 229), rgb(34 35 38));
   content: '';
 }
 
-
+.expanded::before,
 .expanded::after {
   width: calc(100% - 10px);
 }
