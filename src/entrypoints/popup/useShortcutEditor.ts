@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent } from 'react'
 import { useOptions } from '@/hooks/useOptions'
 import type { KeyBindingName, KeyBindings } from '@/storage/keyBindings'
+import { getShortcutKey, hasModifierKey } from '@/utils/shortcut'
 
 export const labels: Record<KeyBindingName, string> = {
   rec: '녹화',
@@ -60,12 +61,8 @@ export function useShortcutEditor() {
     }
     if (event.repeat || isSaving) return
 
-    const key = /^[a-z0-9]$/i.test(event.key)
-      ? event.key.toUpperCase()
-      : /^(Key[A-Z]|Digit[0-9])$/.test(event.code)
-        ? event.code.replace(/^(Key|Digit)/, '')
-        : ''
-    if (!key || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
+    const key = getShortcutKey(event)
+    if (key === null || hasModifierKey(event)) {
       setError('조합키는 사용할 수 없어요.')
       return
     }

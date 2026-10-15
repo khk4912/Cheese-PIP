@@ -1,7 +1,7 @@
 import { useOptions } from '@/hooks/useOptions'
 
 import { CheeseButtonBase } from '../CheeseButtonBase'
-import { useShortcut } from '@/hooks/keyBinding'
+import { useShortcut } from '@/hooks/useShortcut'
 import RecordIcon from '@/assets/static/rec.svg?react'
 import { useRecord } from '@/hooks/record'
 
