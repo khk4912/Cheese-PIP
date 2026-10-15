@@ -26,13 +26,6 @@ export async function getKeyBindings(): Promise<KeyBindings> {
   return mergeKeyBindings(keyBindings)
 }
 
-export const setKeyBindings = async <T extends keyof KeyBindings>(
-  key: T,
-  value: NonNullable<KeyBindings[T]>
-): Promise<void> => {
-  const keyBindings = await getKeyBindings()
-  await storage.setItem<Required<KeyBindings>>(KEYBINDINGS_STORAGE_KEY, {
-    ...keyBindings,
-    [key]: value,
-  })
+export async function setKeyBindings(keyBindings: Partial<KeyBindings>): Promise<void> {
+  await storage.setItem<KeyBindings>(KEYBINDINGS_STORAGE_KEY, mergeKeyBindings(keyBindings))
 }

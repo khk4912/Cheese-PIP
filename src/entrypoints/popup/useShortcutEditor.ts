@@ -1,57 +1,55 @@
-import { useRef, useState, type KeyboardEvent } from 'react'
+import { useState, type KeyboardEvent } from 'react'
 import { useOptions } from '@/hooks/useOptions'
-import { getKeyBindings, setKeyBindings, type KeyBindings } from '@/storage/keyBindings'
+import type { KeyBindingName, KeyBindings } from '@/storage/keyBindings'
 
-export const labels: Record<keyof KeyBindings, string> = {
+export const labels: Record<KeyBindingName, string> = {
   rec: '녹화',
   screenshot: '스크린샷',
   pip: 'PIP+',
 }
-export const bindings = Object.keys(labels) as Array<keyof KeyBindings>
+export const bindings = Object.keys(labels) as KeyBindingName[]
+
+function findDuplicateBinding(
+  keyBindings: KeyBindings,
+  binding: KeyBindingName,
+  key: string
+): KeyBindingName | undefined {
+  return bindings.find(other => other !== binding && keyBindings[other].toUpperCase() === key)
+}
 
 export function useShortcutEditor() {
-  const { keyBindings } = useOptions()
-  const savingRef = useRef(false)
-  const [editing, setEditing] = useState<keyof KeyBindings | null>(null)
+  const { keyBindings, isSaving, updateKeyBinding } = useOptions()
+  const [editing, setEditing] = useState<KeyBindingName | null>(null)
   const [error, setError] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
 
   const cancelEditing = () => {
-    if (savingRef.current) return
+    if (isSaving) return
     setEditing(null)
     setError('')
   }
-  const save = async (binding: keyof KeyBindings, key: string) => {
-    if (savingRef.current) return
-    savingRef.current = true
-    setIsSaving(true)
-    setError('')
-    try {
-      const latest = await getKeyBindings()
-      const duplicate = bindings.find(
-        other => other !== binding && latest[other].toUpperCase() === key
-      )
-      if (duplicate) {
-        setError(`${labels[duplicate]}에서 사용 중인 키예요.`)
-        return
-      }
-      await setKeyBindings(binding, key)
-      setEditing(null)
-    } catch {
-      setError('저장하지 못했어요. 키를 다시 눌러주세요.')
-    } finally {
-      savingRef.current = false
-      setIsSaving(false)
-    }
-  }
 
-  const startEditing = (binding: keyof KeyBindings) => {
-    if (savingRef.current) return
+  const startEditing = (binding: KeyBindingName) => {
+    if (isSaving) return
     setEditing(binding)
     setError('')
   }
 
-  const handleKeyDown = (binding: keyof KeyBindings, event: KeyboardEvent<HTMLButtonElement>) => {
+  const save = async (binding: KeyBindingName, key: string) => {
+    const duplicate = findDuplicateBinding(keyBindings, binding, key)
+    if (duplicate) {
+      setError(`${labels[duplicate]}에서 사용 중인 키예요.`)
+      return
+    }
+
+    setError('')
+    if (await updateKeyBinding(binding, key)) {
+      setEditing(null)
+    } else {
+      setError('저장하지 못했어요. 키를 다시 눌러주세요.')
+    }
+  }
+
+  const handleKeyDown = (binding: KeyBindingName, event: KeyboardEvent<HTMLButtonElement>) => {
     if (editing !== binding) return
     if (event.key === 'Tab') return
     event.preventDefault()
@@ -60,7 +58,8 @@ export function useShortcutEditor() {
       cancelEditing()
       return
     }
-    if (event.repeat || savingRef.current) return
+    if (event.repeat || isSaving) return
+
     const key = /^[a-z0-9]$/i.test(event.key)
       ? event.key.toUpperCase()
       : /^(Key[A-Z]|Digit[0-9])$/.test(event.code)

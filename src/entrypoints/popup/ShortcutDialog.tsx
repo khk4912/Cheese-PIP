@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { PopupButton } from './components/PopupButton'
 import { bindings, labels, useShortcutEditor } from './useShortcutEditor'
 
 function ShortcutDialog({ onClose }: { onClose: () => void }) {
@@ -10,6 +12,7 @@ function ShortcutDialog({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const dialog = dialogRef.current!
     dialog.showModal()
+
     return () => dialog.close()
   }, [])
 
@@ -106,15 +109,11 @@ export function ShortcutSetting() {
   const [isOpen, setIsOpen] = useState(false)
   return (
     <>
-      <button
-        type="button"
-        aria-haspopup="dialog"
-        onClick={() => setIsOpen(true)}
-        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 transition-colors hover:cursor-pointer hover:bg-white/10"
-      >
+      <PopupButton aria-haspopup="dialog" onClick={() => setIsOpen(true)}>
         단축키 설정
-      </button>
-      {isOpen && <ShortcutDialog onClose={() => setIsOpen(false)} />}
+      </PopupButton>
+      {/* 저장 중 비활성화되는 팝업 fieldset 밖에 렌더링해 편집 중인 버튼의 포커스를 유지합니다. */}
+      {isOpen && createPortal(<ShortcutDialog onClose={() => setIsOpen(false)} />, document.body)}
     </>
   )
 }
