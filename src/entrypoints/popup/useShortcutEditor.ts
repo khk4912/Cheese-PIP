@@ -1,6 +1,6 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { useOptions } from '@/hooks/useOptions'
-import { getKeyBindings, setKeyBindings, type KeyBindings } from '@/utils/options'
+import { getKeyBindings, setKeyBindings, type KeyBindings } from '@/storage/keyBindings'
 
 export const labels: Record<keyof KeyBindings, string> = {
   rec: '녹화',

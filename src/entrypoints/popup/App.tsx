@@ -3,7 +3,7 @@ import '@/assets/tailwind.css'
 
 import { useState } from 'react'
 import { cn } from '@/utils/cn'
-import type { CheesePIPOptions } from '@/utils/options'
+import type { CheesePIPOptions } from '@/storage/options'
 import { useOptions } from '@/hooks/useOptions'
 import { ShortcutSetting } from './ShortcutDialog'
 

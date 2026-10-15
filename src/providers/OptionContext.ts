@@ -1,5 +1,6 @@
 import { createContext } from 'react'
-import type { KeyBindings, CheesePIPOptions } from '@/utils/options'
+import type { CheesePIPOptions } from '@/storage/options'
+import type { KeyBindings } from '@/storage/keyBindings'
 
 export type OptionContextValue = {
   options: CheesePIPOptions

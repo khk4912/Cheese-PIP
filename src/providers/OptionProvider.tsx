@@ -1,17 +1,19 @@
 import { storage } from '#imports'
 import { useEffect, useRef, useState, type PropsWithChildren } from 'react'
 import {
-  DEFAULT_KEYBINDINGS,
+  DEFAULT_OPTIONS,
   getOptions,
+  mergeOptions,
+  OPTIONS_STORAGE_KEY,
+  setOptions,
+} from '@/storage/options'
+import {
+  DEFAULT_KEYBINDINGS,
   getKeyBindings,
   KEYBINDINGS_STORAGE_KEY,
-  mergeOptions,
   mergeKeyBindings,
-  OPTIONS_STORAGE_KEY,
-  DEFAULT_OPTIONS,
-  setOptions,
   setKeyBindings,
-} from '@/utils/options'
+} from '@/storage/keyBindings'
 import { OptionContext, type OptionContextValue } from './OptionContext'
 
 function useStoredValue<T>(

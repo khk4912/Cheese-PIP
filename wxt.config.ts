@@ -1,5 +1,4 @@
 import { defineConfig } from 'wxt'
-import path from 'path'
 import svgr from 'vite-plugin-svgr'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -40,17 +39,6 @@ export default defineConfig({
   vite: () => ({
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-        '@/entrypoints': path.resolve(__dirname, 'src/entrypoints'),
-        '@/components': path.resolve(__dirname, 'src/components'),
-        '@/hooks': path.resolve(__dirname, 'src/hooks'),
-        '@/utils': path.resolve(__dirname, 'src/utils'),
-        '@/types': path.resolve(__dirname, 'src/types'),
-        '@/assets': path.resolve(__dirname, 'src/assets'),
-      },
     },
     plugins: [svgr(), tailwindcss()],
     css: {
