@@ -1,3 +1,4 @@
+import { resetSettings } from '@/storage/reset'
 import { ShortcutSetting } from '../ShortcutDialog'
 import { PopupButton } from './PopupButton'
 
@@ -8,7 +9,7 @@ export function Footer() {
         <ShortcutSetting />
         <PopupButton
           onClick={() => {
-            void storage.clear('local')
+            void resetSettings()
           }}
         >
           설정 초기화
