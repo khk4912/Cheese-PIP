@@ -2,14 +2,14 @@ import { cn } from '@/utils/cn'
 
 type CheeseButtonBaseProps = {
   title: string
-  iconSVG: React.ReactNode
+  icon: React.ReactNode
   className?: string
   onClick?: () => void
   disabled?: boolean
 }
 export function CheeseButtonBase({
   title,
-  iconSVG,
+  icon,
   className,
   onClick,
   disabled,
@@ -27,7 +27,7 @@ export function CheeseButtonBase({
       onClick={onClick}
     >
       <span className="pzp-button__tooltip pzp-button__tooltip--top">{title}</span>
-      <span className="pzp-ui-icon">{iconSVG}</span>
+      <span className="pzp-ui-icon">{icon}</span>
     </button>
   )
 }

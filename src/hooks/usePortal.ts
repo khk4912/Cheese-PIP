@@ -1,29 +1,5 @@
-import { useState, useEffect } from 'react'
-
-export function useElementTarget(selector: string) {
-  const [target, setTarget] = useState<Element | undefined>(undefined)
-  useEffect(() => {
-    if (target !== undefined) {
-      return
-    }
-
-    const interval = window.setInterval(() => {
-      const element = document.querySelector(selector)
-      if (element === null) {
-        return
-      }
-
-      window.clearInterval(interval)
-      setTarget(element)
-    }, 100)
-
-    return () => {
-      window.clearInterval(interval)
-    }
-  }, [selector, target])
-
-  return target
-}
+import { useEffect, useState } from 'react'
+import { useElementTarget } from './useElementTarget'
 
 /*
 before: target의 이전 형제 요소로 삽입
@@ -69,12 +45,7 @@ export function usePortal({ targetSelector, id, position = 'after', style }: Use
       after: 'afterend',
     }
 
-    const insertPosition = positionMap[position]
-    if (insertPosition) {
-      tgNode.insertAdjacentElement(insertPosition, div)
-    } else {
-      tgNode.appendChild(div)
-    }
+    tgNode.insertAdjacentElement(positionMap[position], div)
 
     // DOM 부착 결과를 반영한 다음 포털의 자식과 단축키를 활성화합니다.
     // oxlint-disable-next-line react/set-state-in-effect

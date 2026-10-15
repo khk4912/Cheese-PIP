@@ -9,12 +9,10 @@ interface RecordInfoBase {
   resultBlobURL: string
   streamInfo: StreamInfo
   isMP4: boolean
-  highFrameRec?: boolean
-  audioBlobURL?: string
 }
 
 interface HighFPSRecordInfo extends RecordInfoBase {
-  highFrameRec?: true
+  highFrameRec: true
   audioBlobURL: string
 }
 

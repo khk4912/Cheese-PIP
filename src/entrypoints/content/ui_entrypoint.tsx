@@ -2,40 +2,32 @@ import { inject } from '@/utils/inject'
 import { OptionProvider } from '@/providers/OptionProvider'
 import { PlayerButtonsRenderer } from '@/components/PlayerButtons'
 
-export function RenderUI() {
-  let div = document.createElement('div')
-  div.id = 'cheese-pip-ui-root'
+function mount() {
+  const container = document.createElement('div')
+  container.id = 'cheese-pip-ui-root'
+  document.body.appendChild(container)
 
-  let root = inject(
+  const root = inject(
     <OptionProvider>
       <PlayerButtonsRenderer />
     </OptionProvider>,
-    div
+    container
   )
 
-  document.body.appendChild(div)
-  const remount = () => {
+  return () => {
     root.unmount()
-    div.remove()
-
-    div = document.createElement('div')
-    div.id = 'cheese-pip-ui-root'
-
-    document.body.appendChild(div)
-    root = inject(
-      <OptionProvider>
-        <PlayerButtonsRenderer />
-      </OptionProvider>,
-      div
-    )
+    container.remove()
   }
+}
 
-  const unmount = () => {
-    root.unmount()
-    div.remove()
-  }
+export function RenderUI() {
+  let unmount = mount()
 
   // 변경 감지 후 remount
+  const remount = () => {
+    unmount()
+    unmount = mount()
+  }
 
   // firefox window.navigation fallback 로직
   if (import.meta.env.BROWSER === 'firefox') {

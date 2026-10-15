@@ -6,7 +6,7 @@ export function ScreenshotButton() {
     <CheeseButtonBase
       title="스크린샷 (준비 중)"
       className="cheese-pip-screenshot-button"
-      iconSVG={<ScreenshotIcon />}
+      icon={<ScreenshotIcon />}
       disabled
     />
   )

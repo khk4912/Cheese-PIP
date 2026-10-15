@@ -6,7 +6,7 @@ export function PipButton() {
     <CheeseButtonBase
       title="PIP+ (준비 중)"
       className="cheese-pip-pip-button"
-      iconSVG={<PipIcon />}
+      icon={<PipIcon />}
       disabled
     />
   )

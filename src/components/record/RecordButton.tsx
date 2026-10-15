@@ -3,7 +3,7 @@ import { useOptions } from '@/hooks/useOptions'
 import { CheeseButtonBase } from '../CheeseButtonBase'
 import { useShortcut } from '@/hooks/useShortcut'
 import RecordIcon from '@/assets/static/rec.svg?react'
-import { useRecord } from '@/hooks/record'
+import { useRecord } from '@/hooks/useRecord'
 
 const RecordingColor = '#ff6161'
 
@@ -18,10 +18,10 @@ export function RecordButton() {
 
   return (
     <CheeseButtonBase
-      title={`녹화 ${isRecording ? '중지' : ''} (${recKey})`}
+      title={`${isRecording ? '녹화 중지' : '녹화'} (${recKey})`}
       className="cheese-pip-record-button"
       onClick={toggle}
-      iconSVG={<RecordIcon fill={isRecording ? RecordingColor : 'currentColor'} />}
+      icon={<RecordIcon fill={isRecording ? RecordingColor : 'currentColor'} />}
     />
   )
 }
