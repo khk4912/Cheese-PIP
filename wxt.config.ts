@@ -24,7 +24,7 @@ export default defineConfig({
         matches: ['<all_urls>'],
       },
       {
-        resources: ['rec-sink.html'],
+        resources: ['cheese-pip-rec-iframe.html'],
         matches: ['https://chzzk.naver.com/*'],
       },
     ],
