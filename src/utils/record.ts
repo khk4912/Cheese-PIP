@@ -14,6 +14,18 @@ const getChromeVersion = (): number | false => {
 
 const isMoz = navigator.userAgent.includes('Firefox')
 
+// Firefox 149부터 제공되는 표준 API는 원본 플레이어의 오디오 출력을 유지한다.
+// 두 녹화 모드에서 같은 API를 사용해 mozCaptureStream과 섞이지 않게 한다.
+function captureVideoStream (video: HTMLVideoElement): MediaStream {
+  return typeof video.captureStream === 'function'
+    ? video.captureStream()
+    : video.mozCaptureStream()
+}
+
+function stopTracks (stream: MediaStream): void {
+  stream.getTracks().forEach(track => { track.stop() })
+}
+
 /**
  * 녹화 기능에서 MP4로 녹화 여부를 확인합니다.
  * (Chrome 128 이상, video/mp4;codecs=avc1,mp4a.40.2 지원 여부, 사용자 설정)
@@ -36,19 +48,25 @@ const checkMP4 = async (): Promise<boolean> => {
  */
 export async function startRecord (video: HTMLVideoElement): Promise<MediaRecorder | null> {
   const streamInfo = getStreamInfo(document)
-  const stream = isMoz ? video.mozCaptureStream() : video.captureStream()
-
   const videoBitsPerSecond = (await getOption()).videoBitsPerSecond
   const isMP4 = await checkMP4()
-  const recorder = new MediaRecorder(stream, {
-    mimeType:
-    isMP4
-      ? 'video/mp4;codecs=avc1,mp4a.40.2'
-      : isMoz
-        ? 'video/webm;codecs:avc1'
-        : 'video/webm;codecs=avc1',
-    videoBitsPerSecond,
-  })
+  const stream = captureVideoStream(video)
+  let recorder: MediaRecorder
+  try {
+    recorder = new MediaRecorder(stream, {
+      mimeType:
+        isMP4
+          ? 'video/mp4;codecs=avc1,mp4a.40.2'
+          : isMoz
+            ? 'video/webm;codecs:avc1'
+            : 'video/webm;codecs=avc1',
+      videoBitsPerSecond,
+    })
+  } catch (error) {
+    stopTracks(stream)
+    throw error
+  }
+  recorder.addEventListener('stop', () => { stopTracks(stream) }, { once: true })
 
   recorder.recordInfo = {
     startDateTime: new Date().getTime(),
@@ -67,7 +85,12 @@ export async function startRecord (video: HTMLVideoElement): Promise<MediaRecord
     recorder.recordInfo.resultBlobURL = URL.createObjectURL(event.data)
   }
 
-  recorder.start()
+  try {
+    recorder.start()
+  } catch (error) {
+    stopTracks(stream)
+    throw error
+  }
   return recorder
 }
 
@@ -95,11 +118,21 @@ export async function startHighFrameRateRecord (video: HTMLVideoElement): Promis
   canvas.width = video.videoWidth
   canvas.height = video.videoHeight
 
+  const videoStream = canvas.captureStream(60) // 60fps
+  let capturedStream: MediaStream
+  try {
+    capturedStream = captureVideoStream(video)
+  } catch (error) {
+    stopTracks(videoStream)
+    throw error
+  }
+  // 고프레임 영상은 canvas에서 가져오므로 원본의 비디오 트랙은 필요 없다.
+  capturedStream.getVideoTracks().forEach(track => { track.stop() })
+
   const highFrameRateCanvasInteval = window.setInterval(() => {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
   }, 1000 / 60) // 60fps
 
-  const videoStream = canvas.captureStream(60) // 60fps
   const recordingStream = new MediaStream() // 실제 녹화하는 스트림
 
   videoStream.getVideoTracks().forEach(track => {
@@ -107,7 +140,12 @@ export async function startHighFrameRateRecord (video: HTMLVideoElement): Promis
   }) // 비디오 트랙 추가
 
   // cavnas 스트림은 오디오를 포함하지 않으므로, 원본 비디오의 오디오 트랙 추가
-  recordingStream.addTrack(video.captureStream().getAudioTracks()[0])
+  capturedStream.getAudioTracks().forEach(track => { recordingStream.addTrack(track) })
+  const cleanup = (): void => {
+    window.clearInterval(highFrameRateCanvasInteval)
+    stopTracks(videoStream)
+    stopTracks(capturedStream)
+  }
   const newRecordInfo: RecordInfo = {
     startDateTime: new Date().getTime(),
     stopDateTime: -1,
@@ -116,18 +154,25 @@ export async function startHighFrameRateRecord (video: HTMLVideoElement): Promis
     isMP4
   }
 
-  const videoRecorder = new MediaRecorder(
-    recordingStream,
-    {
-      mimeType:
-        isMP4
-          ? 'video/mp4;codecs=avc1,mp4a.40.2'
-          : isMoz
-            ? 'video/webm'
-            : 'video/webm;codecs=avc1',
-      videoBitsPerSecond
-    }
-  )
+  let videoRecorder: MediaRecorder
+  try {
+    videoRecorder = new MediaRecorder(
+      recordingStream,
+      {
+        mimeType:
+          isMP4
+            ? 'video/mp4;codecs=avc1,mp4a.40.2'
+            : isMoz
+              ? 'video/webm'
+              : 'video/webm;codecs=avc1',
+        videoBitsPerSecond
+      }
+    )
+  } catch (error) {
+    cleanup()
+    throw error
+  }
+  videoRecorder.addEventListener('stop', cleanup, { once: true })
   videoRecorder.recordInfo = newRecordInfo
   videoRecorder.ondataavailable = (event) => {
     if (event.data.size === 0) return
@@ -138,8 +183,13 @@ export async function startHighFrameRateRecord (video: HTMLVideoElement): Promis
 
     videoRecorder.recordInfo.resultBlobURL = URL.createObjectURL(event.data)
   }
-  videoRecorder.start()
-  await setRecordInfo(newRecordInfo)
+  try {
+    await setRecordInfo(newRecordInfo)
+    videoRecorder.start()
+  } catch (error) {
+    cleanup()
+    throw error
+  }
 
   return [videoRecorder, highFrameRateCanvasInteval] as const
 }

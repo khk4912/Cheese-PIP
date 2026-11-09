@@ -8,23 +8,49 @@ function handleFirefoxAudio (video: HTMLVideoElement): () => void {
   const ctx = new AudioContext()
   const stream = new MediaStream()
 
-  video.mozCaptureStream()
-    .getAudioTracks()
+  const capturedStream = video.mozCaptureStream()
+  capturedStream.getVideoTracks().forEach(track => { track.stop() })
+  capturedStream.getAudioTracks()
     .forEach((track) => {
       stream.addTrack(track)
     })
   const src = ctx.createMediaStreamSource(stream)
+  const gain = ctx.createGain()
 
-  src.connect(ctx.destination)
-  return () => { ctx.close().catch(console.error) }
+  // AudioContext 출력은 video의 음소거/볼륨과 무관하므로, 플레이어 음소거·볼륨 조절을 gain에 반영
+  const syncVolume = (): void => {
+    gain.gain.value = video.muted ? 0 : video.volume
+  }
+  syncVolume()
+  video.addEventListener('volumechange', syncVolume)
+
+  src.connect(gain)
+  gain.connect(ctx.destination)
+  return () => {
+    video.removeEventListener('volumechange', syncVolume)
+    capturedStream.getTracks().forEach(track => { track.stop() })
+    ctx.close().catch(console.error)
+  }
+}
+
+// 표준 captureStream이 없는 구버전 Firefox에서만 재생 우회를 유지한다.
+// mozCaptureStream 이후 원본 비디오는 녹화 종료 후에도 계속 음소거될 수 있다.
+// 컴포넌트가 재마운트되면 ref가 초기화되어 AudioContext가 중복 생성(소리 중복)되므로 모듈 단위로 관리
+let firefoxAudio: { video: HTMLVideoElement, cleanup: () => void } | null = null
+
+function ensureFirefoxAudio (video: HTMLVideoElement): void {
+  if (firefoxAudio?.video === video) {
+    return // 같은 비디오에 이미 적용됨
+  }
+
+  firefoxAudio?.cleanup() // 비디오 element가 바뀐 경우 이전 것 정리
+  firefoxAudio = { video, cleanup: handleFirefoxAudio(video) }
 }
 
 export function useRecord () {
   const [isRecording, setIsRecording] = useState(false)
   const { options } = useOptions()
   const { fastRec, highFrameRateRec } = options
-
-  const cleanupFirefoxAudioRef = useRef<() => void>(() => {})
 
   const recorder = useRef<MediaRecorder>()
   const canvasInterval = useRef<number>()
@@ -40,6 +66,15 @@ export function useRecord () {
   }, [isRecording, fastRec])
 
   const clickHandler = async (): Promise<void> => {
+    // 녹화 중에는 플레이어가 음소거되거나 교체되어도 중지할 수 있어야 한다.
+    if (isRecording) {
+      setIsRecording(false)
+      window.clearInterval(canvasInterval.current)
+      canvasInterval.current = undefined
+      await _stopRecord(recorder, fastRec)
+      return
+    }
+
     const video: HTMLVideoElement | null = document.querySelector('.webplayer-internal-video')
     if (video === null) {
       return
@@ -55,20 +90,20 @@ export function useRecord () {
       return
     }
 
-    const newRec = !isRecording
-    setIsRecording(newRec)
+    setIsRecording(true)
 
     // 녹화 시작
-    if (newRec) {
-      // 고프레임 녹화 시
-      if (isMoz) {
-        cleanupFirefoxAudioRef.current = handleFirefoxAudio(video)
+    try {
+      // 표준 captureStream은 원본 소리를 유지하므로 별도로 재생하면 소리가 겹친다.
+      if (isMoz && typeof video.captureStream !== 'function') {
+        ensureFirefoxAudio(video)
       }
 
       if (highFrameRateRec) {
         const [_videoRecorder, _canvasInterval] = await startHighFrameRateRecord(video) ?? [null, null, null]
 
         if (_videoRecorder === null || _canvasInterval === null) {
+          setIsRecording(false)
           return
         }
 
@@ -78,28 +113,15 @@ export function useRecord () {
         const _recorder = await startRecord(video)
 
         if (_recorder === null) {
+          setIsRecording(false)
           return
         }
         recorder.current = _recorder
       }
-
-      return
+    } catch (error) {
+      setIsRecording(false)
+      throw error
     }
-
-    // 녹화 중지
-    if ((recorder.current?.recordInfo?.highFrameRec) ?? false) {
-      if (recorder.current === undefined || canvasInterval.current === undefined) {
-        return
-      }
-      clearInterval(canvasInterval.current) // 고프레임 녹화 canvas interval 제거
-
-      // Firefox에서 issue 핸들 후 cleanup
-      if (isMoz && cleanupFirefoxAudioRef.current) {
-        cleanupFirefoxAudioRef.current()
-        cleanupFirefoxAudioRef.current = () => {}
-      }
-    }
-    await _stopRecord(recorder, fastRec)
   }
 
   return {
@@ -121,8 +143,10 @@ async function _stopRecord (
     return
   }
 
-  const info = await stopRecord(recorder.current)
+  // 상태 변경에 따른 effect cleanup이 같은 recorder를 다시 중지하지 않게 먼저 분리한다.
+  const currentRecorder = recorder.current
   recorder.current = undefined
+  const info = await stopRecord(currentRecorder)
 
   if (info.resultBlobURL === '') {
     return
